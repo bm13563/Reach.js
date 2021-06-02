@@ -7,6 +7,10 @@ export abstract class Component {
     debug: string = "";
 
     constructor(position: IPosition, props?: any) {
+        if (position[0] + position[3] > 100)
+            throw Error("Element vertically overflows parent");
+        if (position[1] + position[2] > 100)
+            throw Error("Element horizontally overflows parent");
         this.position = [...position];
         this.props = { ...props };
         this.mount();
@@ -26,17 +30,24 @@ export abstract class Component {
         return this.element;
     }
 
+    _renderChildren(components: Component[]): string {
+        const html = components.map((component: Component) => {
+            return component.render();
+        });
+        return html.join(" ");
+    }
+
     render(): string {
         const flexKey = Date.now() + Math.random();
         const elementKey = flexKey + 1;
         const html = `
         <div 
             class="${flexKey}"
-            style="position: relative; display: flex; 
+            style="position: absolute;
                 top: ${this.position[0]}%; 
-                left: ${this.position[0]}%; 
-                width: ${this.position[0]}%; 
-                height: ${this.position[0]}%;
+                left: ${this.position[1]}%; 
+                width: ${this.position[2]}%; 
+                height: ${this.position[3]}%;
                 ${
                     this.debug === ""
                         ? ""
@@ -51,11 +62,7 @@ export abstract class Component {
                 ${
                     typeof this.element.nodes === "string"
                         ? this.element?.nodes
-                        : this.element?.nodes
-                              ?.map((component: Component) => {
-                                  return component.render();
-                              })
-                              .join(" ")
+                        : this._renderChildren(this.element?.nodes)
                 }
             </${this.element?.type}>
         </div>
