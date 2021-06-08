@@ -1,6 +1,6 @@
-import { Component } from "./component";
+import { Image } from "./image";
 
-export type INodes = string | Component[];
+export type INodes = string | Image[];
 
 export type IPosition = [number, number, number, number];
 

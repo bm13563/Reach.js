@@ -1,20 +1,22 @@
-import { HelloWorld } from "./testing/test";
+import { isInt32Array } from "util/types";
+import { Container, Counter } from "./mocking/mock";
+import { Page } from "./page/page";
 
-const ii = new HelloWorld([0, 0, 25, 25], { test: "ii" });
-ii.debugOn("red");
+// const menu1 = new Menu([0, 0, 50, 50], {
+//     title: "My menu!",
+//     menuItems: ["test1", "test2", "test3"],
+// });
+// menu1.debugOn("red");
 
-const hi = new HelloWorld([25, 25, 25, 25], { test: "hi" });
-hi.debugOn("blue");
+// const menu2 = new Menu([0, 0, 50, 50], {
+//     title: "My menu has changed",
+//     menuItems: ["test1"],
+// });
+// menu2.debugOn("red");
 
-const hi4 = new HelloWorld([25, 25, 50, 50], { test: "hi" });
-hi4.debugOn("orange");
+// const sideContainer = new Container([0, 0, 25, 100], { children: menu1 });
+// sideContainer.debugOn("blue");
 
-const hi3 = new HelloWorld([25, 50, 50, 75], { test: "hi", children: [hi4] });
-hi3.debugOn("yellow");
+// const testPage = new Page("testPage", sideContainer);
 
-const hi2 = new HelloWorld([25, 25, 50, 50], {
-    test: "hi",
-    children: [hi, ii, hi3],
-});
-hi2.debugOn("green");
-console.log(hi2.render());
+const counterPage = new Page("counter").addRootImage(new Container([0, 0, 50, 50]));
