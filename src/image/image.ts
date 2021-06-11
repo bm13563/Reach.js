@@ -63,7 +63,12 @@ export class Image {
         return renderPropKey;
     }
 
-    image(image: Image, key: string) {
+    image(image: Image) {
+        const error = new Error().stack;
+        const errorLines = error.split("\n")[2];
+        const lineNumber = errorLines.split(":").slice(-2)[0];
+        const colNumber = errorLines.split(":").slice(-1)[0].replace(')', '');
+        const key = `${lineNumber + colNumber}`;
         if (key in this.images) {
             this.images[key].mount();
             return this.images[key].html;

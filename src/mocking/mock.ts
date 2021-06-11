@@ -13,8 +13,8 @@ export class Container extends Image {
     mount() {
         this.compile(`
         <div>
-            ${this.image(new Counter([0, 0, 50, 50]), "test")}
-            ${this.image(new Counter([50, 50, 50, 50]), "test2")}
+            ${this.image(new Counter([0, 0, 50, 50]))}
+            ${this.image(new Counter([50, 50, 50, 50]))}
         </div>
         `);
     }
