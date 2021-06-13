@@ -21,7 +21,7 @@ export class Page {
     currentNode: HTMLElement;
     currentTree: any;
     newTree: any;
-    renderProps: any = {};
+    events: any = {};
 
     constructor(name: string) {
         this.name = name;
@@ -34,12 +34,12 @@ export class Page {
         this.newTree = this.convertHTMLWithKey(this.child.html);
         this.currentNode = createElement(this.newTree[0]);
         document.body.appendChild(this.currentNode);
-        this.replaceRenderProps(this.newTree);
+        this.replaceevents(this.newTree);
         this.currentTree = this.newTree;
     }
 
     update() {
-        this.renderProps = {};
+        this.events = {};
         this.child.mount();
         this.newTree = this.convertHTMLWithKey(this.child.html);
         this.render();
@@ -48,7 +48,7 @@ export class Page {
     render() {
         const patches = diff(this.currentTree[0], this.newTree[0]);
         this.currentNode = patch(this.currentNode, patches);
-        this.replaceRenderProps(this.newTree);
+        this.replaceevents(this.newTree);
         this.currentTree = this.newTree;
     }
 
@@ -63,25 +63,22 @@ export class Page {
         );
     }
 
-    replaceRenderProps(tree) {
+    replaceevents(tree) {
         tree.forEach((child: any) => {
             if (child.tagName !== "style" && child.tagName !== undefined) {
                 for (let attribute in child.properties.attributes) {
-                    if (
-                        child.properties.attributes[attribute] in
-                        this.renderProps
-                    ) {
+                    if (child.properties.attributes[attribute] in this.events) {
                         let lAttribute = attribute.toLowerCase();
-                        const renderPropsKeys =
+                        const eventsKeys =
                             child.properties.attributes[attribute];
                         const target = document.querySelector(
-                            `[${lAttribute}=${renderPropsKeys}]`,
+                            `[${lAttribute}=${eventsKeys}]`,
                         );
-                        target[lAttribute] = this.renderProps[renderPropsKeys];
+                        target[lAttribute] = this.events[eventsKeys];
                         return;
                     }
                 }
-                this.replaceRenderProps(child.children);
+                this.replaceevents(child.children);
             }
         });
         return;

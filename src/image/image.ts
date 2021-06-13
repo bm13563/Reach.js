@@ -2,20 +2,18 @@ import { Page } from "../page/page";
 import { IElement, INodes, IPosition } from "./types";
 
 export class Image {
+    imageId: string = "i" + `${Date.now() + Math.random()}`.replace(".", "");
     page: Page;
     position: IPosition;
     html: string = "";
-    props?: any;
-    renderProps: any = {};
-    debug: string = "";
     state: any = {};
-    images: any = {};
-    imageKey: string;
+    children: any = {};
+    props?: any;
+    debug: string = "";
 
     constructor(position: IPosition, props?: any) {
         this.position = [...position];
         this.props = { ...props };
-        this.imageKey = "i" + `${Date.now() + Math.random()}`.replace(".", "");
     }
 
     mount(): any {
@@ -23,10 +21,9 @@ export class Image {
     }
 
     compile(html: string) {
-        this.html = html;
         const wrappedHtml = `
         <div 
-            id="${this.imageKey}"
+            id="${this.imageId}"
             style="position: absolute;
                 flex-flow: column;
                 top: ${this.position[0]}%; 
@@ -39,10 +36,10 @@ export class Image {
                         : "background-color: " + this.debug + ";"
                 }"
         >
-            ${this.html}
+            ${html}
         </div>
         <style>
-        div#${this.imageKey} {}
+        div#${this.imageId} {}
         </style>
         `;
         const parsedHtml = wrappedHtml
@@ -56,10 +53,10 @@ export class Image {
         return parsedHtml;
     }
 
-    prop(prop: any) {
+    event(event: any) {
         const renderPropKey =
             "r" + `${Date.now() + Math.random()}`.replace(".", "");
-        this.page.renderProps[renderPropKey] = prop;
+        this.page.events[renderPropKey] = event;
         return renderPropKey;
     }
 
@@ -67,17 +64,21 @@ export class Image {
         const error = new Error().stack;
         const errorLines = error.split("\n")[2];
         const lineNumber = errorLines.split(":").slice(-2)[0];
-        const colNumber = errorLines.split(":").slice(-1)[0].replace(')', '');
+        const colNumber = errorLines.split(":").slice(-1)[0].replace(")", "");
         const key = `${lineNumber + colNumber}`;
-        if (key in this.images) {
-            this.images[key].mount();
-            return this.images[key].html;
+        if (key in this.children) {
+            this.children[key].mount();
+            return this.children[key].html;
         } else {
             image.page = this.page;
-            this.images[key] = image;
+            this.children[key] = image;
             image.mount();
             return image.html;
         }
+    }
+
+    getState(key: string) {
+        return this.state[key];
     }
 
     setState(key: string, value: any) {

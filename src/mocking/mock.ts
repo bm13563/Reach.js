@@ -5,7 +5,7 @@ interface IHelloWorld {
     child: Image;
 }
 
-export class Container extends Image {
+export class Container1 extends Image {
     constructor(position: IPosition, props?: IHelloWorld) {
         super(position, props);
     }
@@ -13,86 +13,60 @@ export class Container extends Image {
     mount() {
         this.compile(`
         <div>
-            ${this.image(new Counter([0, 0, 50, 50]))}
-            ${this.image(new Counter([50, 50, 50, 50]))}
+            ${this.image(new Container([0, 0, 100, 100]))}
         </div>
         `);
     }
 }
 
-// interface IMenu {
-//     title: string;
-//     menuItems: string[];
-// }
+export class Container extends Image {
+    constructor(position: IPosition, props?: IHelloWorld) {
+        super(position, props);
+    }
 
-// export class Menu extends Image {
-//     constructor(position: IPosition, props?: IMenu) {
-//         super(position, props);
-//     }
+    mount() {
+        this.compile(`
+            <div>
+                ${this.image(
+                    new Counter([0, 0, 50, 50], { title: "Counter 1" }),
+                )}
+                ${this.image(
+                    new Counter([50, 50, 50, 50], { title: "Counter 2" }),
+                )}
+            </div>
+        `);
+    }
+}
 
-//     mount() {
-//         const menuItems: string = this.props.menuItems
-//             .map((menuItem: IMenu) => {
-//                 return `<li><a href="#${menuItem}">${menuItem}</a></li>`;
-//             })
-//             .join("");
-
-//         this.setState("title", "My menu title");
-
-//         this.stage(`
-//         <style>
-//         ul {
-//             list-style-type: none;
-//             margin: 0;
-//             padding: 0;
-//             background-color: #f1f1f1;
-//         }
-
-//         li a {
-//             display: block;
-//             color: #000;
-//             padding: 8px 16px;
-//             text-decoration: none;
-//         }
-
-//         li a:hover {
-//             background-color: #555;
-//             color: white;
-//         }
-//         </style>
-
-//         <h5>${this.state.title}</h5>
-
-//         <ul>
-//             ${menuItems}
-//         </ul>
-//         `);
-//     }
-// }
+interface ICounter {
+    title: string;
+}
 
 export class Counter extends Image {
-    constructor(position: IPosition) {
-        super(position);
+    constructor(position: IPosition, props: ICounter) {
+        super(position, props);
         this.state = {
+            ...props,
             count: 0,
         };
     }
 
     mount() {
         const aTest = () => {
-            let newCount = this.state.count + 1;
-            this.setState("count", newCount);
-            console.log(this.state.count);
+            this.setState("count", this.getState("count") + 1);
         };
 
         this.compile(`
-        <div>
-            ${this.state.count}
-        </div>
-        <button onClick=${this.prop(aTest)}>A nice new button</button>
-        <style>
-            * {font-size: 25px;}
-        </style>
+            <div>
+                ${this.getState("title")}
+            </div>
+            <div>
+                ${this.getState("count")}
+            </div>
+            <button onClick=${this.event(aTest)}>A nice new button</button>
+            <style>
+                * {font-size: 25px;}
+            </style>
         `);
     }
 }
