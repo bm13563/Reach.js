@@ -2,7 +2,8 @@
     "scripts": {
         "lint": "yarn prettier --write .",
         "start": "yarn prettier --write . & ts-node src/index.ts",
-        "serve": "webpack serve --mode development"
+        "serve": "webpack serve --mode development",
+        "build": "webpack"
     },
     "devDependencies": {
         "@types/node": "^15.6.1",
