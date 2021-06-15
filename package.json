@@ -21,6 +21,7 @@
         "webpack-dev-server": "^3.11.2"
     },
     "dependencies": {
+        "dom2hscript": "^0.2.3",
         "node-polyfill-webpack-plugin": "^1.1.2"
     }
 }

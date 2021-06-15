@@ -63,7 +63,7 @@ export class Counter extends Image {
             <div>
                 ${this.getState("count")}
             </div>
-            <button onClick=${this.event(aTest)}>A nice new button</button>
+            <button onClick=${this.pass(aTest)}>A nice new button</button>
             <style>
                 * {font-size: 25px;}
             </style>

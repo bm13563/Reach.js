@@ -53,11 +53,17 @@ export class Image {
         return parsedHtml;
     }
 
-    event(event: any) {
-        const renderPropKey =
+    pass(callback: any) {
+        const callbackId =
             "r" + `${Date.now() + Math.random()}`.replace(".", "");
-        this.page.events[renderPropKey] = event;
-        return renderPropKey;
+        const callbackProps = {
+            callbackId: callbackId,
+            callback: callback,
+        };
+        this.imageId in this.page.callbacks
+            ? this.page.callbacks[this.imageId].push(callbackProps)
+            : (this.page.callbacks[this.imageId] = [callbackProps]);
+        return `${callbackId} data-${callbackId}="${callbackId}"`;
     }
 
     image(image: Image) {
