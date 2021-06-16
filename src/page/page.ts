@@ -60,7 +60,7 @@ export class Page {
         );
     }
 
-    // adds callbacks (e.g event listeners) to the DOM once it has been reconciled and rendered
+    // adds callbacks (e.g event listeners) to the DOM once it has been reconciled and rendered.
     // goes through the callbacks object, finds the element by the callbackId, checks if the
     // value of the element's attributes matches the callback id
     injectCallbacks() {
@@ -69,21 +69,27 @@ export class Page {
                 const element = document.querySelector(
                     `[data-${callback.callbackId}]`,
                 );
-                for (
-                    let attribute = 0;
-                    attribute < element.attributes.length;
-                    attribute++
-                ) {
-                    const attributeName =
-                        element.attributes[attribute].nodeName;
-                    const attributeValue =
-                        element.attributes[attribute].nodeValue;
-                    if (attributeValue == callback.callbackId) {
-                        element[attributeName] = callback.callback;
+                if (element) {
+                    for (
+                        let attribute = 0;
+                        attribute < element.attributes.length;
+                        attribute++
+                    ) {
+                        const attributeName =
+                            element.attributes[attribute].nodeName;
+                        const attributeValue =
+                            element.attributes[attribute].nodeValue;
+                        if (attributeValue == callback.callbackId) {
+                            element[attributeName] = callback.callback;
+                        }
                     }
+                } else {
+                    console.log(
+                        `WARN: Unmounted component exists: ${callback.imageName} - ${callback.imageId}`,
+                    );
                 }
             });
         });
-        this.callbacks = { };
+        this.callbacks = {};
     }
 }

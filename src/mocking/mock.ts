@@ -5,34 +5,22 @@ interface IHelloWorld {
     child: Image;
 }
 
-export class Container1 extends Image {
-    constructor(position: IPosition, props?: IHelloWorld) {
-        super(position, props);
-    }
-
-    mount() {
-        this.compile(`
-        <div>
-            ${this.image(new Container([0, 0, 100, 100]))}
-        </div>
-        `);
-    }
-}
-
 export class Container extends Image {
     constructor(position: IPosition, props?: IHelloWorld) {
         super(position, props);
     }
 
     mount() {
+        const counter1 = this.image(
+            new Counter([50, 0, 50, 50], { title: "Counter 2" }).debugOn("#00ff00"),
+        );
+
         this.compile(`
             <div>
                 ${this.image(
-                    new Counter([0, 0, 50, 50], { title: "Counter 1" }),
+                    new Counter([0, 0, 50, 50], { title: "Counter 1" }).debugOn(),
                 )}
-                ${this.image(
-                    new Counter([50, 50, 50, 50], { title: "Counter 2" }),
-                )}
+                ${counter1}
             </div>
         `);
     }

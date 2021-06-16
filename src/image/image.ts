@@ -3,6 +3,7 @@ import { IElement, INodes, IPosition } from "./types";
 
 export class Image {
     imageId: string = "i" + `${Date.now() + Math.random()}`.replace(".", "");
+    imageName: string;
     page: Page;
     position: IPosition;
     html: string = "";
@@ -14,6 +15,7 @@ export class Image {
     constructor(position: IPosition, props?: any) {
         this.position = [...position];
         this.props = { ...props };
+        this.imageName = this.constructor.name;
     }
 
     mount(): any {
@@ -57,6 +59,8 @@ export class Image {
         const callbackId =
             "r" + `${Date.now() + Math.random()}`.replace(".", "");
         const callbackProps = {
+            imageId: this.imageId,
+            imageName: this.imageName,
             callbackId: callbackId,
             callback: callback,
         };
@@ -66,7 +70,7 @@ export class Image {
         return `${callbackId} data-${callbackId}="${callbackId}"`;
     }
 
-    image(image: Image) {
+    image(image: Image): string {
         const error = new Error().stack;
         const errorLines = error.split("\n")[2];
         const lineNumber = errorLines.split(":").slice(-2)[0];
@@ -94,9 +98,11 @@ export class Image {
 
     debugOn(debugColour: string = "#ff0000") {
         this.debug = debugColour;
+        return this;
     }
 
     debugOff() {
         this.debug = "";
+        return this;
     }
 }
