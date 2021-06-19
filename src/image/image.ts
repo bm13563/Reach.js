@@ -7,6 +7,7 @@ export class Image {
     page: Page;
     position: IPosition;
     html: string = "";
+    css: string = "";
     state: any = {};
     children: any = {};
     props?: any;
@@ -22,7 +23,12 @@ export class Image {
         // do nothing
     }
 
+    style(css: string): any {
+        this.css = css;
+    }
+
     compile(html: string) {
+        // this.scale();
         const wrappedHtml = `
         <div 
             id="${this.imageId}"
@@ -41,7 +47,7 @@ export class Image {
             ${html}
         </div>
         <style>
-        div#${this.imageId} {}
+            div#${this.imageId} ${this.css ? this.css : "{}"}
         </style>
         `;
         const parsedHtml = wrappedHtml
@@ -86,6 +92,10 @@ export class Image {
             return image.html;
         }
     }
+
+    // scale() {
+    //     console.log(this.page.document.body.clientHeight);
+    // }
 
     getState(key: string) {
         return this.state[key];

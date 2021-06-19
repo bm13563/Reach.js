@@ -18,7 +18,6 @@ export class Page {
     rootImage: Image;
     currentNode: HTMLElement;
     currentTree: any;
-    newTree: any;
     callbacks: any = {};
 
     constructor(name: string) {
@@ -29,24 +28,24 @@ export class Page {
         this.rootImage = image;
         this.rootImage.page = this;
         this.rootImage.mount();
-        this.newTree = this.convertHTMLWithKey(this.rootImage.html);
-        this.currentNode = createElement(this.newTree[0]);
+        this.currentTree = this.convertHTMLWithKey(this.rootImage.html);
+        console.log(this.currentTree);
+        this.currentNode = createElement(this.currentTree[0]);
         document.body.appendChild(this.currentNode);
         this.injectCallbacks();
-        this.currentTree = this.newTree;
     }
 
     update() {
         this.rootImage.mount();
-        this.newTree = this.convertHTMLWithKey(this.rootImage.html);
         this.render();
     }
 
     render() {
-        const patches = diff(this.currentTree[0], this.newTree[0]);
+        const newTree = this.convertHTMLWithKey(this.rootImage.html);
+        const patches = diff(this.currentTree[0], newTree[0]);
         this.currentNode = patch(this.currentNode, patches);
+        this.currentTree = newTree;
         this.injectCallbacks();
-        this.currentTree = this.newTree;
     }
 
     convertHTMLWithKey(html: string) {

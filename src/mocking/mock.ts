@@ -12,13 +12,21 @@ export class Container extends Image {
 
     mount() {
         const counter1 = this.image(
-            new Counter([50, 0, 50, 50], { title: "Counter 2" }).debugOn("#00ff00"),
+            new Counter([50, 0, 75, 50], { title: "Counter 2" }).debugOn(
+                "#00ff00",
+            ),
         );
 
+        this.style(`.test {
+            color: white;
+        }`);
+
         this.compile(`
-            <div>
+            <div class="test">
                 ${this.image(
-                    new Counter([0, 0, 50, 50], { title: "Counter 1" }).debugOn(),
+                    new Counter([0, 0, 50, 50], {
+                        title: "Counter 1",
+                    }).debugOn(),
                 )}
                 ${counter1}
             </div>
