@@ -1,3 +1,3 @@
-# Flex.js
+# Reach.js
 
-UI framework leveraging flexboxes
+A really really tiny UI framework

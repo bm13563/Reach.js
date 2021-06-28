@@ -1,4 +1,4 @@
-import { Component } from "../component/component";
+import { Component } from "../component";
 
 interface IHelloWorld {
     child: Component;
@@ -10,9 +10,9 @@ export class Container extends Component {
     }
 
     mount() {
-        // const counter1 = this.child(
-        //     new Counter({ title: "Counter 2" }).debugOn("#00ff00"),
-        // );
+        const counter1 = this.child(
+            new Counter({ title: "Counter 2" }).debugOn("#00ff00"),
+        );
 
         this.style(`.test {
             color: white;
@@ -25,6 +25,7 @@ export class Container extends Component {
                         title: "Counter 1",
                     }).debugOn(),
                 )}
+                ${counter1}
             </div>
         `);
     }
