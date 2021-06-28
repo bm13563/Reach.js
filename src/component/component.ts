@@ -1,22 +1,19 @@
 import { Page } from "../page/page";
-import { IElement, INodes, IPosition } from "./types";
 
-export class Image {
-    imageId: string = "i" + `${Date.now() + Math.random()}`.replace(".", "");
-    imageName: string;
+export class Component {
+    id: string = "i" + `${Date.now() + Math.random()}`.replace(".", "");
+    name: string;
     page: Page;
-    position: IPosition;
     html: string = "";
     css: string = "";
     state: any = {};
     children: any = {};
-    props?: any;
     debug: string = "";
+    props?: any;
 
-    constructor(position: IPosition, props?: any) {
-        this.position = [...position];
+    constructor(props?: any) {
         this.props = { ...props };
-        this.imageName = this.constructor.name;
+        this.name = this.constructor.name;
     }
 
     mount(): any {
@@ -28,55 +25,41 @@ export class Image {
     }
 
     compile(html: string) {
-        // this.scale();
-        const wrappedHtml = `
+        this.html = `
         <div 
-            id="${this.imageId}"
-            style="position: absolute;
-                flex-flow: column;
-                top: ${this.position[0]}%; 
-                left: ${this.position[1]}%; 
-                width: ${this.position[2]}%; 
-                height: ${this.position[3]}%;
-                ${
-                    this.debug === ""
-                        ? ""
-                        : "background-color: " + this.debug + ";"
-                }"
+            id="${this.id}"
         >
             ${html}
         </div>
         <style>
-            div#${this.imageId} ${this.css ? this.css : "{}"}
+            div#${this.id} ${this.css ? this.css : "{}"}
         </style>
-        `;
-        const parsedHtml = wrappedHtml
+        `
             .replace(/\s\s+/g, " ")
             .replace(/\n/g, "")
             .replace(/ </g, "<")
             .replace(/< /g, "<")
             .replace(/> /g, ">")
             .replace(/ >/g, ">");
-        this.html = parsedHtml;
-        return parsedHtml;
+        return this.html;
     }
 
-    pass(callback: any) {
+    register(callback: any) {
         const callbackId =
             "r" + `${Date.now() + Math.random()}`.replace(".", "");
         const callbackProps = {
-            imageId: this.imageId,
-            imageName: this.imageName,
+            id: this.id,
+            name: this.name,
             callbackId: callbackId,
             callback: callback,
         };
-        this.imageId in this.page.callbacks
-            ? this.page.callbacks[this.imageId].push(callbackProps)
-            : (this.page.callbacks[this.imageId] = [callbackProps]);
+        this.id in this.page.callbacks
+            ? this.page.callbacks[this.id].push(callbackProps)
+            : (this.page.callbacks[this.id] = [callbackProps]);
         return `${callbackId} data-${callbackId}="${callbackId}"`;
     }
 
-    image(image: Image): string {
+    child(childComponent: Component): string {
         const error = new Error().stack;
         const errorLines = error.split("\n")[2];
         const lineNumber = errorLines.split(":").slice(-2)[0];
@@ -86,16 +69,12 @@ export class Image {
             this.children[key].mount();
             return this.children[key].html;
         } else {
-            image.page = this.page;
-            this.children[key] = image;
-            image.mount();
-            return image.html;
+            childComponent.page = this.page;
+            this.children[key] = childComponent;
+            childComponent.mount();
+            return childComponent.html;
         }
     }
-
-    // scale() {
-    //     console.log(this.page.document.body.clientHeight);
-    // }
 
     getState(key: string) {
         return this.state[key];

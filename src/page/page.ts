@@ -10,12 +10,11 @@ var convertHTML = require("html-to-vdom")({
     VText: VText,
 });
 
-import { Image } from "../image/image";
-import { IPosition } from "../image/types";
+import { Component } from "../component/component";
 
 export class Page {
     name: string;
-    rootImage: Image;
+    rootComponent: Component;
     currentNode: HTMLElement;
     currentTree: any;
     callbacks: any = {};
@@ -24,24 +23,23 @@ export class Page {
         this.name = name;
     }
 
-    addRootImage(image: Image) {
-        this.rootImage = image;
-        this.rootImage.page = this;
-        this.rootImage.mount();
-        this.currentTree = this.convertHTMLWithKey(this.rootImage.html);
-        console.log(this.currentTree);
+    addRootImage(rootComponent: Component) {
+        this.rootComponent = rootComponent;
+        this.rootComponent.page = this;
+        this.rootComponent.mount();
+        this.currentTree = this.convertHTMLWithKey(this.rootComponent.html);
         this.currentNode = createElement(this.currentTree[0]);
         document.body.appendChild(this.currentNode);
         this.injectCallbacks();
     }
 
     update() {
-        this.rootImage.mount();
+        this.rootComponent.mount();
         this.render();
     }
 
     render() {
-        const newTree = this.convertHTMLWithKey(this.rootImage.html);
+        const newTree = this.convertHTMLWithKey(this.rootComponent.html);
         const patches = diff(this.currentTree[0], newTree[0]);
         this.currentNode = patch(this.currentNode, patches);
         this.currentTree = newTree;
@@ -84,7 +82,7 @@ export class Page {
                     }
                 } else {
                     console.log(
-                        `WARN: Unmounted component exists: ${callback.imageName} - ${callback.imageId}`,
+                        `WARN: Unmounted component exists: ${callback.name} - ${callback.id}`,
                     );
                 }
             });
