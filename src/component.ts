@@ -20,8 +20,10 @@ export class Component {
         // do nothing
     }
 
-    style(css: string): any {
-        this.css = css;
+    style(css: string[]): any {
+        this.css = css
+            .map((attribute) => `div#${this.id} ${attribute}`)
+            .join(" ");
     }
 
     compile(html: string) {
@@ -32,7 +34,7 @@ export class Component {
             ${html}
         </div>
         <style>
-            div#${this.id} ${this.css ? this.css : "{}"}
+            ${this.css ? this.css : "{}"}
         </style>
         `
             .replace(/\s\s+/g, " ")

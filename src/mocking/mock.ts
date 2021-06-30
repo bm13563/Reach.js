@@ -14,10 +14,6 @@ export class Container extends Component {
             new Counter({ title: "Counter 2" }).debugOn("#00ff00"),
         );
 
-        this.style(`.test {
-            color: white;
-        }`);
-
         this.compile(`
             <div class="test">
                 ${this.child(
@@ -41,25 +37,35 @@ export class Counter extends Component {
         this.state = {
             ...props,
             count: 0,
+            colour: ["black", "red", "green", "yellow", "blue"],
         };
     }
 
     mount() {
-        const aTest = () => {
+        const increment = () => {
             this.setState("count", this.getState("count") + 1);
         };
+
+        const changeColour = (count: number): string => {
+            const colourIndex = count % this.getState("colour").length;
+            return this.getState("colour")[colourIndex];
+        };
+
+        this.style([
+            `* { font-size: 25px; }`,
+            `.counter { color: ${changeColour(this.getState("count"))}; }`,
+        ]);
 
         this.compile(`
             <div>
                 ${this.getState("title")}
             </div>
-            <div>
+            <div class="counter">
                 ${this.getState("count")}
             </div>
-            <button onClick=${this.register(aTest)}>A nice new button</button>
-            <style>
-                * {font-size: 25px;}
-            </style>
+            <button onClick=${this.register(
+                increment,
+            )}>A nice new button</button>
         `);
     }
 }

@@ -2,7 +2,7 @@
     "scripts": {
         "lint": "yarn prettier --write .",
         "start": "yarn prettier --write . & ts-node src/index.ts",
-        "serve": "webpack serve --mode development",
+        "serve": "yarn lint & webpack serve --mode development",
         "build": "webpack"
     },
     "devDependencies": {
