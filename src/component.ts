@@ -1,14 +1,14 @@
 import { Page } from "./page";
+import { generateId } from "./utilities";
 
 export class Component {
-    id: string = "i" + `${Date.now() + Math.random()}`.replace(".", "");
+    id: string = generateId();
     name: string;
     page: Page;
     html: string = "";
     css: string = "";
     state: any = {};
     children: any = {};
-    debug: string = "";
     props?: any;
 
     constructor(props?: any) {
@@ -21,34 +21,19 @@ export class Component {
     }
 
     style(css: string[]): any {
-        this.css = css
-            .map((attribute) => `div#${this.id} ${attribute}`)
-            .join(" ");
+        this.css = css.map((attribute) => `${attribute}`).join(" ");
     }
 
     compile(html: string) {
         this.html = `
-        <div 
-            id="${this.id}"
-        >
-            ${html}
-        </div>
-        <style>
-            ${this.css ? this.css : "{}"}
-        </style>
-        `
-            .replace(/\s\s+/g, " ")
-            .replace(/\n/g, "")
-            .replace(/ </g, "<")
-            .replace(/< /g, "<")
-            .replace(/> /g, ">")
-            .replace(/ >/g, ">");
+            <style>${this.css ? this.css : "{}"}</style>
+            ${html.replace(">", `data-reachid=${this.id}>`)}
+        `;
         return this.html;
     }
 
     register(callback: any) {
-        const callbackId =
-            "r" + `${Date.now() + Math.random()}`.replace(".", "");
+        const callbackId = generateId();
         const callbackProps = {
             id: this.id,
             name: this.name,
@@ -85,15 +70,5 @@ export class Component {
     setState(key: string, value: any) {
         this.state[key] = value;
         this.page.update();
-    }
-
-    debugOn(debugColour: string = "#ff0000") {
-        this.debug = debugColour;
-        return this;
-    }
-
-    debugOff() {
-        this.debug = "";
-        return this;
     }
 }

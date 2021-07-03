@@ -39,7 +39,8 @@ export class Page {
     }
 
     textToNode(dom) {
-        return new DOMParser().parseFromString(dom, "text/html").body
+        const wrapped = `<div>${dom}</div>`;
+        return new DOMParser().parseFromString(wrapped, "text/html").body
             .firstChild;
     }
 
@@ -76,5 +77,12 @@ export class Page {
             });
         });
         this.callbacks = {};
+    }
+
+    importCSS(cdn: string) {
+        const link = document.createElement("link");
+        link.setAttribute("rel", "stylesheet");
+        link.setAttribute("href", cdn);
+        document.head.appendChild(link);
     }
 }
