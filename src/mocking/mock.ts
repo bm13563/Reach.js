@@ -55,14 +55,16 @@ export class Counter extends Component {
 
         this.compile(`
             <div>
-                ${this.getState("title")}
+                <div>
+                    ${this.getState("title")}
+                </div>
+                <div class="counter">
+                    ${this.getState("count")}
+                </div>
+                <button onClick=${this.register(
+                    increment,
+                )}>A nice new button</button>
             </div>
-            <div class="counter">
-                ${this.getState("count")}
-            </div>
-            <button onClick=${this.register(
-                increment,
-            )}>A nice new button</button>
         `);
     }
 }

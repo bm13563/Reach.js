@@ -9,6 +9,8 @@ export class Component {
     css: string = "";
     state: any = {};
     children: any = {};
+    parent: Component;
+    shouldMount: boolean = true;
     props?: any;
 
     constructor(props?: any) {
@@ -20,15 +22,32 @@ export class Component {
         // do nothing
     }
 
+    mountIfNeeded(): string {
+        if (this.shouldMount) {
+            this.mount();
+            this.shouldMount = false;
+        } else {
+            console.log(this.id, this.name, "doesnt need to render!");
+            return this.html;
+        }
+    }
+
     style(css: string[]): any {
-        this.css = css.map((attribute) => `${attribute}`).join(" ");
+        // TODO how reliable is this?
+        this.css = css
+            .map((attribute) =>
+                attribute.replace(" {", `[data-reachid="${this.id}"] {`),
+            )
+            .join(" ");
     }
 
     compile(html: string) {
         this.html = `
             <style>${this.css ? this.css : "{}"}</style>
-            ${html.replace(">", `data-reachid=${this.id}>`)}
+            ${html}
         `;
+        // TODO this works but is potentially kinda janky and slow
+        this.html = this.html.replace(/>/g, ` data-reachid=${this.id}>`);
         return this.html;
     }
 
@@ -53,12 +72,13 @@ export class Component {
         const colNumber = errorLines.split(":").slice(-1)[0].replace(")", "");
         const key = `${lineNumber + colNumber}`;
         if (key in this.children) {
-            this.children[key].mount();
+            this.children[key].mountIfNeeded();
             return this.children[key].html;
         } else {
             childComponent.page = this.page;
+            childComponent.parent = this;
             this.children[key] = childComponent;
-            childComponent.mount();
+            childComponent.mountIfNeeded();
             return childComponent.html;
         }
     }
@@ -69,6 +89,15 @@ export class Component {
 
     setState(key: string, value: any) {
         this.state[key] = value;
+        this.shouldMount = true;
+        this.parentShouldMount();
         this.page.update();
+    }
+
+    parentShouldMount() {
+        if (this.parent) {
+            this.parent.shouldMount = true;
+            this.parent.parentShouldMount();
+        }
     }
 }

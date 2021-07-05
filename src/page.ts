@@ -17,7 +17,7 @@ export class Page {
     addRootImage(rootComponent: Component) {
         this.rootComponent = rootComponent;
         this.rootComponent.page = this;
-        this.rootComponent.mount();
+        this.rootComponent.mountIfNeeded();
         this.currentNode = this.textToNode(this.rootComponent.html);
         this.injectCallbacks(this.currentNode);
         this.currentTree = toVNode(this.currentNode);
@@ -26,7 +26,7 @@ export class Page {
     }
 
     update() {
-        this.rootComponent.mount();
+        this.rootComponent.mountIfNeeded();
         this.render();
     }
 
@@ -38,6 +38,7 @@ export class Page {
         this.currentTree = tree;
     }
 
+    // TODO this should be a utility function
     textToNode(dom) {
         const wrapped = `<div>${dom}</div>`;
         return new DOMParser().parseFromString(wrapped, "text/html").body
