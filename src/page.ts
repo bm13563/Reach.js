@@ -34,6 +34,7 @@ export class Page {
         const node = this.textToNode(this.rootComponent.html);
         this.injectCallbacks(node);
         const tree = toVNode(node);
+        console.log(tree);
         patch(this.currentTree, tree);
         this.currentTree = tree;
     }

@@ -33,7 +33,6 @@ export class Component {
     }
 
     style(css: string[]): any {
-        // TODO how reliable is this?
         this.css = css
             .map((attribute) =>
                 attribute.replace(" {", `[data-reachid="${this.id}"] {`),
@@ -41,13 +40,18 @@ export class Component {
             .join(" ");
     }
 
-    compile(html: string) {
+    compile(componentHtml: string) {
+        let html = componentHtml.replace(/>/g, ` data-reachid="${this.id}">`);
+        Object.keys(this.children).forEach((childKey: string) => {
+            const childId = this.children[childKey].id;
+            const childHtml = this.children[childKey].html;
+            html = html.replace(childId, childHtml);
+        });
         this.html = `
             <style>${this.css ? this.css : "{}"}</style>
             ${html}
         `;
-        // TODO this works but is potentially kinda janky and slow
-        this.html = this.html.replace(/>/g, ` data-reachid=${this.id}>`);
+        console.log(this.html);
         return this.html;
     }
 
@@ -73,13 +77,20 @@ export class Component {
         const key = `${lineNumber + colNumber}`;
         if (key in this.children) {
             this.children[key].mountIfNeeded();
-            return this.children[key].html;
+            return this.children[key].id;
         } else {
             childComponent.page = this.page;
             childComponent.parent = this;
             this.children[key] = childComponent;
             childComponent.mountIfNeeded();
-            return childComponent.html;
+            return childComponent.id;
+        }
+    }
+
+    parentShouldMount() {
+        if (this.parent) {
+            this.parent.shouldMount = true;
+            this.parent.parentShouldMount();
         }
     }
 
@@ -92,12 +103,5 @@ export class Component {
         this.shouldMount = true;
         this.parentShouldMount();
         this.page.update();
-    }
-
-    parentShouldMount() {
-        if (this.parent) {
-            this.parent.shouldMount = true;
-            this.parent.parentShouldMount();
-        }
     }
 }
