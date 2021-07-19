@@ -51,7 +51,6 @@ export class Component {
             <style>${this.css ? this.css : "{}"}</style>
             ${html}
         `;
-        console.log(this.html);
         return this.html;
     }
 

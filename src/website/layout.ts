@@ -7,24 +7,24 @@ export class Layout extends Component {
     }
 
     mount() {
-        
         const tinyCard = new Card({
             headerText: "Tiny!",
             bodyText: "Reach.js is less than 1000 lines of code unminified.",
             backgroundColourBase: "black",
-        })
+        });
 
         const unopinionatedCard = new Card({
             headerText: "Accepting",
             bodyText: "Reach.js doesn't place restrictions on how you develop.",
             backgroundColourBase: "black",
-        })
+        });
 
         const simpleCard = new Card({
             headerText: "Simple",
-            bodyText: "Components are written in HTML / CSS, with an intuitive API.",
+            bodyText:
+                "Components are written in HTML / CSS, with an intuitive API.",
             backgroundColourBase: "black",
-        })
+        });
 
         this.style([
             `.wrapper { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); height: 100vh; gap: 50px; padding-left: 20vw; padding-right: 20vw; }`,

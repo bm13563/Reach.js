@@ -11,14 +11,14 @@ export class Card extends Component {
         super(props);
         this.state = {
             open: false,
-        }
+        };
     }
 
     mount() {
         const changeState = () => {
             const newState = !this.getState("open");
             this.setState("open", newState);
-        }
+        };
 
         this.style([
             `.wrapper { text-align: center; border-radius: 10px; height: 100%; border: 3px solid ${this.props.backgroundColourBase}; }`,
@@ -32,7 +32,9 @@ export class Card extends Component {
             <div onclick=${this.register(changeState)} class="wrapper">
                 <div class="title">${this.props.headerText}</div>
                 <div class="body">
-                    <div class="text${this.getState("open") ? "" : " hidden"}">${this.props.bodyText}</div>
+                    <div class="text${
+                        this.getState("open") ? "" : " hidden"
+                    }">${this.props.bodyText}</div>
                 </div>
             </div>
         `);
