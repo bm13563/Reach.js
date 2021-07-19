@@ -34,19 +34,7 @@ export class Page {
         this.injectCallbacks(node);
         const tree = toVNode(node);
         this.addDataset(tree);
-        // // @ts-ignore
-        // console.log(
-        //     // @ts-ignore
-        //     tree.children[3].children[3].children[3].children[3].children[1]
-        //         .elm,
-        // );
         patch(this.currentTree, tree);
-        // @ts-ignore
-        // console.log(
-        //     // @ts-ignore
-        //     tree.children[3].children[3].children[3].children[3].children[1]
-        //         .elm,
-        // );
         this.currentTree = tree;
     }
 

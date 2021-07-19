@@ -20,12 +20,24 @@ export class Card extends Component {
             this.setState("open", newState);
         };
 
+        const cardHeight = () => {
+            return this.getState("open") ? 100 : 50;
+        }
+
         this.style([
-            `.wrapper { text-align: center; border-radius: 10px; height: 100%; border: 3px solid ${this.props.backgroundColourBase}; }`,
+            `.wrapper {
+                text-align: center; border-radius: 10px; height: 100%; 
+                border: 3px solid ${this.props.backgroundColourBase}; height: ${cardHeight()}%; 
+                transition: height 0.2s;
+            }`,
+            `.wrapper:hover { cursor: pointer; }`,
             `.title { font-size: 3vw; padding: 10px; margin-top: 30px; }`,
             `.body { margin: 15px 5px 15px 5px; }`,
             `.text { font-size: 1.5vw;  }`,
-            `.hidden { color: red; }`,
+            `.hidden { 
+                visibility: ${this.getState("open") ? "visible" : "hidden"}; 
+                transition: visibility: ${this.getState("open") ? 0 : 0.2} 
+            }`,
         ]);
 
         this.compile(`
