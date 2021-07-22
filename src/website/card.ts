@@ -27,16 +27,16 @@ export class Card extends Component {
         this.style([
             `.wrapper {
                 text-align: center; border-radius: 10px; height: 100%; 
-                border: 3px solid ${
-                    this.props.backgroundColourBase
-                }; 
+                border: 3px solid ${this.props.backgroundColourBase}; 
                 height: ${cardHeight()}%; 
                 transition: height 0.2s;
             }`,
             `.wrapper:hover { cursor: pointer; }`,
             `.title { font-size: 3vw; padding: 10px; margin-top: 30px; display: inline-block; }`,
             `.title::after { content: ''; width: 0px; height: 3px; display: block; background: black; transition: 300ms; }`,
-            `.title::after { width: ${this.getState("open") ? "100%" : "0%"}; }`,
+            `.title::after { width: ${
+                this.getState("open") ? "100%" : "0%"
+            }; }`,
             `.body { margin: 15px 5px 15px 5px; }`,
             `.text { 
                 font-size: 1.5vw;

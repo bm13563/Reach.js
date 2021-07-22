@@ -1,5 +1,6 @@
 import { Page } from "./page";
 import { generateId } from "./utilities";
+import { getSync } from "stacktrace-js";
 
 export class Component {
     id: string = generateId();
@@ -34,11 +35,8 @@ export class Component {
 
     style(css: string[]): any {
         this.css = css
-            .map((attribute) =>
-                `[data-reachid="${this.id}"]${attribute}`
-            )
+            .map((attribute) => `[data-reachid="${this.id}"]${attribute}`)
             .join(" ");
-        console.log(this.css);
     }
 
     compile(componentHtml: string) {
@@ -70,11 +68,8 @@ export class Component {
     }
 
     child(childComponent: Component): string {
-        const error = new Error().stack;
-        const errorLines = error.split("\n")[2];
-        const lineNumber = errorLines.split(":").slice(-2)[0];
-        const colNumber = errorLines.split(":").slice(-1)[0].replace(")", "");
-        const key = `${lineNumber + colNumber}`;
+        const trace = getSync()[1];
+        const key = `${trace.columnNumber}${trace.lineNumber}`;
         if (key in this.children) {
             this.children[key].mountIfNeeded();
             return this.children[key].id;
@@ -103,5 +98,13 @@ export class Component {
         this.shouldMount = true;
         this.parentShouldMount();
         this.page.update();
+    }
+}
+
+function getErrorObject() {
+    try {
+        throw Error("");
+    } catch (err) {
+        return err;
     }
 }

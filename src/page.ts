@@ -48,7 +48,6 @@ export class Page {
     // TODO this needs validation to check that "data-" definitely refers to
     // a dataset rather than some janky attribute
     addDataset(tree) {
-        // datasets get stored in attrs by toVNode
         if (Object.keys(tree.data.attrs).length > 0) {
             Object.keys(tree.data.attrs).forEach((key: string) => {
                 if (key.includes("data-")) {
@@ -70,9 +69,7 @@ export class Page {
         });
     }
 
-    // adds callbacks (e.g event listeners) to the DOM once it has been reconciled and rendered.
-    // goes through the callbacks object, finds the element by the callbackId, checks if the
-    // value of the element's attributes matches the callback id
+    // TODO can we use the events functionality in snabbdom
     injectCallbacks(node: any) {
         Object.values(this.callbacks).forEach((callbackProps: any) => {
             callbackProps.forEach((callback) => {
