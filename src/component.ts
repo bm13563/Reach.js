@@ -35,9 +35,10 @@ export class Component {
     style(css: string[]): any {
         this.css = css
             .map((attribute) =>
-                attribute.replace(" {", `[data-reachid="${this.id}"] {`),
+                `[data-reachid="${this.id}"]${attribute}`
             )
             .join(" ");
+        console.log(this.css);
     }
 
     compile(componentHtml: string) {
