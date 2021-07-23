@@ -48,7 +48,10 @@ export class Card extends Component {
                 opacity: ${isOpen(1, 0)};
                 max-height: ${isOpen("100px", "0px")};
                 font-size: 1.5vw;
-                transition: max-height 0.4s, padding 0.4s, opacity ${isOpen("0.5s", "0.2s")};
+                transition: max-height 0.4s, padding 0.4s, opacity ${isOpen(
+                    "0.5s",
+                    "0.2s",
+                )};
             }`,
         ]);
 

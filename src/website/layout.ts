@@ -14,7 +14,7 @@ export class Layout extends Component {
         });
 
         const unopinionatedCard = new Card({
-            headerText: "Accepting",
+            headerText: "Flexible",
             bodyText: "Reach.js doesn't place restrictions on how you develop.",
             backgroundColourBase: "black",
         });
