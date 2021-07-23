@@ -2,4 +2,4 @@
 
 A really tiny UI ~~framework~~ library.
 
-Debugging by using: https://bm13563.github.io/Reach.js/.
+Debugging by doing: https://bm13563.github.io/Reach.js/.
