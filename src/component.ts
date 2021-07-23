@@ -112,11 +112,3 @@ export class Component {
         this.page.update();
     }
 }
-
-function getErrorObject() {
-    try {
-        throw Error("");
-    } catch (err) {
-        return err;
-    }
-}
