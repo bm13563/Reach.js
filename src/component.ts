@@ -70,7 +70,7 @@ export class Component {
 
     child(childComponent: Component): string {
         const trace = getSync()[1];
-        console.log(this.name, trace, "trace")
+        console.log(this.name, getSync(), "trace")
         const key = `${trace.columnNumber}${trace.lineNumber}`;
         console.log(this.name, key, "key")
         if (key in this.children) {
