@@ -17,6 +17,7 @@ export class Component {
     constructor(props?: any) {
         this.props = { ...props };
         this.name = this.constructor.name;
+        console.log(this.id, this.name, "id print")
     }
 
     mount(): any {
@@ -69,7 +70,9 @@ export class Component {
 
     child(childComponent: Component): string {
         const trace = getSync()[1];
+        console.log(this.name, trace, "trace")
         const key = `${trace.columnNumber}${trace.lineNumber}`;
+        console.log(this.name, key, "key")
         if (key in this.children) {
             this.children[key].mountIfNeeded();
             return this.children[key].id;
