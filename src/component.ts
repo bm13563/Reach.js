@@ -28,7 +28,6 @@ export class Component {
             this.mount();
             this.shouldMount = false;
         } else {
-            console.log(this.id, this.name, "doesnt need to render!");
             return this.html;
         }
     }

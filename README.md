@@ -1,3 +1,5 @@
 # Reach.js
 
-A really really tiny UI framework
+A really tiny UI ~~framework~~ library.
+
+Debugging by using: https://bm13563.github.io/Reach.js/.
