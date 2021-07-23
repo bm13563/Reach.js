@@ -17,7 +17,6 @@ export class Component {
     constructor(props?: any) {
         this.props = { ...props };
         this.name = this.constructor.name;
-        console.log(this.id, this.name, "id print")
     }
 
     mount(): any {
@@ -69,10 +68,21 @@ export class Component {
     }
 
     child(childComponent: Component): string {
-        const trace = getSync()[1];
-        console.log(this.name, getSync(), "trace")
-        const key = `${trace.columnNumber}${trace.lineNumber}`;
-        console.log(this.name, key, "key")
+        const stack = getSync();
+        const finalStack = stack
+            .filter((element) => {
+                return "functionName" in element ? true : false;
+            })
+            .find((element) => {
+                return element.functionName.includes("mountIfNeeded");
+            });
+        const index = stack.indexOf(finalStack);
+        const key = stack
+            .slice(0, index)
+            .map((element) => {
+                return `${element.columnNumber}${element.lineNumber}`;
+            })
+            .join("");
         if (key in this.children) {
             this.children[key].mountIfNeeded();
             return this.children[key].id;
