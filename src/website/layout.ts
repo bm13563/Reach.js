@@ -1,5 +1,5 @@
 import { Component } from "../component";
-import { Card } from "./card";
+import { Card } from "./flexCard";
 
 export class Layout extends Component {
     constructor() {
