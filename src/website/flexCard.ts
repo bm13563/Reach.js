@@ -11,6 +11,7 @@ export class Card extends Component {
         super(props);
         this.state = {
             open: false,
+            cardHeight: 0,
         };
     }
 
@@ -61,7 +62,7 @@ export class Card extends Component {
                     <div class="title">${this.props.headerText}</div>
                 </div>
                 <div class="body">
-                    <div class="text">${this.props.bodyText}</div>
+                    <div id="test" class="text">${this.props.bodyText}</div>
                 </div>
             </div>
         `);

@@ -1,15 +1,16 @@
-import { init, toVNode, vnode, datasetModule } from "snabbdom";
+import { init, datasetModule } from "snabbdom";
 import { Component } from "./component";
-
-const patch = init([datasetModule]);
+import { textToNode, forkedToVNode } from "./utilities";
 
 export class Page {
+    patch: any;
     name: string;
     rootComponent: Component;
     currentTree: any;
     callbacks: any = {};
 
     constructor(name: string) {
+        this.patch = init([datasetModule]);
         this.name = name;
     }
 
@@ -17,57 +18,59 @@ export class Page {
         this.rootComponent = rootComponent;
         this.rootComponent.page = this;
         this.rootComponent.mountIfNeeded();
-        const node = this.textToNode(this.rootComponent.html);
+        const node = textToNode(this.rootComponent.html);
         this.injectCallbacks(node);
-        this.currentTree = toVNode(node);
+        this.currentTree = forkedToVNode(node);
         document.body.appendChild(node);
+        this.traverseRenderPipeline((child: Component) => {
+            child.deferCallbacks.forEach((callback) => {
+                callback();
+            });
+            child.deferCallbacks = [];
+        });
+        this.traverseRenderPipeline((child: Component) => {
+            child.shouldMount = false;
+        });
         return this;
     }
 
-    update() {
-        this.rootComponent.mountIfNeeded();
-        this.render();
-    }
-
     render() {
-        const node = this.textToNode(this.rootComponent.html);
-        this.injectCallbacks(node);
-        const tree = toVNode(node);
-        this.addDataset(tree);
-        patch(this.currentTree, tree);
-        this.currentTree = tree;
-    }
-
-    // TODO this should be a utility function
-    textToNode(dom) {
-        const wrapped = `<div>${dom}</div>`;
-        return new DOMParser().parseFromString(wrapped, "text/html").body
-            .firstChild;
-    }
-
-    // TODO this needs validation to check that "data-" definitely refers to
-    // a dataset rather than some janky attribute
-    addDataset(tree) {
-        if (Object.keys(tree.data.attrs).length > 0) {
-            Object.keys(tree.data.attrs).forEach((key: string) => {
-                if (key.includes("data-")) {
-                    if ("dataset" in tree.data) {
-                        tree.data["dataset"][key.replace("data-", "")] =
-                            tree.data.attrs[key];
-                    } else {
-                        tree.data["dataset"] = {};
-                        tree.data["dataset"][key.replace("data-", "")] =
-                            tree.data.attrs[key];
-                    }
-                }
+        this.traverseRenderPipeline((child: Component) => {
+            child.clearCallbacks.forEach((callback) => {
+                callback();
             });
-        }
-        tree.children.forEach((child) => {
-            if (child.data && "attrs" in child.data) {
-                this.addDataset(child);
-            }
+            child.deferCallbacks = [];
+        });
+        this.rootComponent.mountIfNeeded();
+        const node = textToNode(this.rootComponent.html);
+        this.injectCallbacks(node);
+        const tree = forkedToVNode(node);
+        this.patch(this.currentTree, tree);
+        this.currentTree = tree;
+        this.traverseRenderPipeline((child: Component) => {
+            child.deferCallbacks.forEach((callback) => {
+                callback();
+            });
+            child.deferCallbacks = [];
+        });
+        this.traverseRenderPipeline((child: Component) => {
+            child.shouldMount = false;
         });
     }
+
+    traverseRenderPipeline = (
+        shouldRenderCallback,
+        component = this.rootComponent,
+    ) => {
+        for (const [key, value] of Object.entries(component.children)) {
+            // @ts-ignore
+            if (value.shouldMount) {
+                shouldRenderCallback(value);
+                // @ts-ignore
+                this.traverseRenderPipeline(shouldRenderCallback, value);
+            }
+        }
+    };
 
     // TODO can we use the events functionality in snabbdom
     injectCallbacks(node: any) {
@@ -100,12 +103,5 @@ export class Page {
             });
         });
         this.callbacks = {};
-    }
-
-    importCSS(cdn: string) {
-        const link = document.createElement("link");
-        link.setAttribute("rel", "stylesheet");
-        link.setAttribute("href", cdn);
-        document.head.appendChild(link);
     }
 }

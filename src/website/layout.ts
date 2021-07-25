@@ -1,5 +1,6 @@
 import { Component } from "../component";
 import { Card } from "./flexCard";
+import { Clock } from "./clock";
 
 export class Layout extends Component {
     constructor() {
@@ -32,6 +33,7 @@ export class Layout extends Component {
             `.one { grid-column: 1; grid-row: 2 / 3; }`,
             `.two { grid-column: 2; grid-row: 2 / 3; }`,
             `.three { grid-column: 3; grid-row: 2 / 3; }`,
+            `.four { grid-column: 1 / 4; grid-row: 3; text-align: center; font-size: 5rem; }`,
         ]);
 
         this.compile(`
@@ -47,6 +49,9 @@ export class Layout extends Component {
                 </div>
                 <div class="three subgrid">
                     ${this.child(simpleCard)}
+                </div>
+                <div class="four subgrid">
+                    ${this.child(new Clock())}
                 </div>
             </div>
         `);

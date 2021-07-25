@@ -10,9 +10,12 @@ export class Component {
     css: string = "";
     state: any = {};
     children: any = {};
+    props?: any;
     parent: Component;
     shouldMount: boolean = true;
-    props?: any;
+    eventCallbacks: any = [];
+    deferCallbacks: any = [];
+    clearCallbacks: any = [];
 
     constructor(props?: any) {
         this.props = { ...props };
@@ -26,7 +29,6 @@ export class Component {
     mountIfNeeded(): string {
         if (this.shouldMount) {
             this.mount();
-            this.shouldMount = false;
         } else {
             return this.html;
         }
@@ -64,6 +66,14 @@ export class Component {
             ? this.page.callbacks[this.id].push(callbackProps)
             : (this.page.callbacks[this.id] = [callbackProps]);
         return `${callbackId} data-${callbackId}="${callbackId}"`;
+    }
+
+    clear(callback: any) {
+        this.clearCallbacks.push(callback);
+    }
+
+    defer(callback: any) {
+        this.deferCallbacks.push(callback);
     }
 
     child(childComponent: Component): string {
@@ -105,10 +115,12 @@ export class Component {
         return this.state[key];
     }
 
-    setState(key: string, value: any) {
+    setState(key: string, value: any, update: boolean = true) {
         this.state[key] = value;
-        this.shouldMount = true;
-        this.parentShouldMount();
-        this.page.update();
+        if (update) {
+            this.shouldMount = true;
+            this.parentShouldMount();
+            this.page.render();
+        }
     }
 }
