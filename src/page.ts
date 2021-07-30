@@ -1,4 +1,4 @@
-import { init, datasetModule } from "snabbdom";
+import { init } from "snabbdom";
 import { Component } from "./component";
 import { textToNode, forkedToVNode } from "./utilities";
 
@@ -9,40 +9,32 @@ export class Page {
     rootComponent: Component;
 
     constructor(name: string) {
-        this.patch = init([datasetModule]);
+        this.patch = init([]);
         this.name = name;
     }
 
     addRootImage(rootComponent: Component) {
         this.rootComponent = rootComponent;
         rootComponent.page = this;
-
         const html = rootComponent.mountIfNeeded();
         const reRenderedComponents = this.traverseRenderPipeline();
-
         const node = textToNode(html);
         this.insertEvents(reRenderedComponents, node);
-
         this.currentTree = forkedToVNode(node);
         document.body.appendChild(node);
-
         reRenderedComponents.map(this.fireDeferCallbacks);
         reRenderedComponents.map(this.resetRenderPipeline);
     }
 
     render() {
-        // the components that need to update are notified before render is called
         const reRenderedComponents = this.traverseRenderPipeline();
         reRenderedComponents.map(this.fireFlushCallbacks);
-
         const html = this.rootComponent.mountIfNeeded();
         const node = textToNode(html);
         this.insertEvents(reRenderedComponents, node);
-
         const tree = forkedToVNode(node);
         this.patch(this.currentTree, tree);
         this.currentTree = tree;
-
         reRenderedComponents.map(this.fireDeferCallbacks);
         reRenderedComponents.map(this.resetRenderPipeline);
         this.rootComponent.shouldMount = true;
@@ -91,8 +83,6 @@ export class Page {
             if (element) {
                 delete element.dataset[event.eventId];
                 element[event.eventType] = event.eventCallback;
-            } else {
-                console.log(`Unmounted component exists: ${event.componentId}`);
             }
         });
         reRenderedComponents.map((child) => (child.eventCallbacks = []));
