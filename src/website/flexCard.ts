@@ -57,7 +57,7 @@ export class Card extends Component {
         ]);
 
         this.compile(`
-            <div onclick=${this.register(changeState)} class="wrapper">
+            <div ${this.register("onclick", changeState)} class="wrapper">
                 <div class="title-wrapper">
                     <div class="title">${this.props.headerText}</div>
                 </div>

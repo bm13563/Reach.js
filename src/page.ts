@@ -5,9 +5,8 @@ import { textToNode, forkedToVNode } from "./utilities";
 export class Page {
     patch: any;
     name: string;
-    rootComponent: Component;
     currentTree: any;
-    callbacks: any = {};
+    rootComponent: Component;
 
     constructor(name: string) {
         this.patch = init([datasetModule]);
@@ -16,92 +15,86 @@ export class Page {
 
     addRootImage(rootComponent: Component) {
         this.rootComponent = rootComponent;
-        this.rootComponent.page = this;
-        this.rootComponent.mountIfNeeded();
-        const node = textToNode(this.rootComponent.html);
-        this.injectCallbacks(node);
+        rootComponent.page = this;
+
+        const html = rootComponent.mountIfNeeded();
+        const reRenderedComponents = this.traverseRenderPipeline();
+
+        const node = textToNode(html);
+        this.insertEvents(reRenderedComponents, node);
+
         this.currentTree = forkedToVNode(node);
         document.body.appendChild(node);
-        this.traverseRenderPipeline((child: Component) => {
-            child.deferCallbacks.forEach((callback) => {
-                callback();
-            });
-            child.deferCallbacks = [];
-        });
-        this.traverseRenderPipeline((child: Component) => {
-            child.shouldMount = false;
-        });
-        return this;
+
+        reRenderedComponents.map(this.fireDeferCallbacks);
+        reRenderedComponents.map(this.resetRenderPipeline);
     }
 
     render() {
-        this.traverseRenderPipeline((child: Component) => {
-            child.clearCallbacks.forEach((callback) => {
-                callback();
-            });
-            child.deferCallbacks = [];
-        });
-        this.rootComponent.mountIfNeeded();
-        const node = textToNode(this.rootComponent.html);
-        this.injectCallbacks(node);
+        // the components that need to update are notified before render is called
+        const reRenderedComponents = this.traverseRenderPipeline();
+        reRenderedComponents.map(this.fireFlushCallbacks);
+
+        const html = this.rootComponent.mountIfNeeded();
+        const node = textToNode(html);
+        this.insertEvents(reRenderedComponents, node);
+
         const tree = forkedToVNode(node);
         this.patch(this.currentTree, tree);
         this.currentTree = tree;
-        this.traverseRenderPipeline((child: Component) => {
-            child.deferCallbacks.forEach((callback) => {
-                callback();
-            });
-            child.deferCallbacks = [];
-        });
-        this.traverseRenderPipeline((child: Component) => {
-            child.shouldMount = false;
-        });
+
+        reRenderedComponents.map(this.fireDeferCallbacks);
+        reRenderedComponents.map(this.resetRenderPipeline);
+        this.rootComponent.shouldMount = true;
     }
 
-    traverseRenderPipeline = (
-        shouldRenderCallback,
-        component = this.rootComponent,
-    ) => {
-        for (const [key, value] of Object.entries(component.children)) {
-            // @ts-ignore
-            if (value.shouldMount) {
-                shouldRenderCallback(value);
-                // @ts-ignore
-                this.traverseRenderPipeline(shouldRenderCallback, value);
-            }
-        }
-    };
-
-    // TODO can we use the events functionality in snabbdom
-    injectCallbacks(node: any) {
-        Object.values(this.callbacks).forEach((callbackProps: any) => {
-            callbackProps.forEach((callback) => {
-                const element = node.querySelector(
-                    `[data-${callback.callbackId}]`,
+    traverseRenderPipeline(component = this.rootComponent): Component[] {
+        const reRenderedComponents = [];
+        if (component.shouldMount) reRenderedComponents.push(component);
+        for (const [childId, child] of Object.entries(component.children)) {
+            if (child.shouldMount)
+                reRenderedComponents.push(
+                    ...this.traverseRenderPipeline(child),
                 );
-                if (element) {
-                    delete element.dataset[callback.callbackId];
-                    for (
-                        let attribute = 0;
-                        attribute < element.attributes.length;
-                        attribute++
-                    ) {
-                        const attributeName =
-                            element.attributes[attribute].nodeName;
-                        const attributeValue =
-                            element.attributes[attribute].nodeValue;
-                        if (attributeValue == callback.callbackId) {
-                            element.removeAttribute(attributeName);
-                            element[attributeName] = callback.callback;
-                        }
-                    }
-                } else {
-                    console.log(
-                        `WARN: Unmounted component exists: ${callback.name} - ${callback.id}`,
-                    );
-                }
-            });
+        }
+        return reRenderedComponents;
+    }
+
+    fireFlushCallbacks(child: Component) {
+        child.flushCallbacks.forEach((callback) => {
+            callback();
         });
-        this.callbacks = {};
+        child.flushCallbacks = [];
+    }
+
+    fireDeferCallbacks(child: Component) {
+        child.deferCallbacks.forEach((callback) => {
+            callback();
+        });
+        child.deferCallbacks = [];
+    }
+
+    getEventCallbacks(child: Component) {
+        return child.eventCallbacks;
+    }
+
+    resetRenderPipeline(child: Component) {
+        child.shouldMount = false;
+    }
+
+    insertEvents(reRenderedComponents: any, node: any) {
+        const events = reRenderedComponents
+            .map((child) => child.eventCallbacks)
+            .reduce((acc, val) => acc.concat(val), []);
+        events.forEach((event) => {
+            const element = node.querySelector(`[data-${event.eventId}]`);
+            if (element) {
+                delete element.dataset[event.eventId];
+                element[event.eventType] = event.eventCallback;
+            } else {
+                console.log(`Unmounted component exists: ${event.componentId}`);
+            }
+        });
+        reRenderedComponents.map((child) => (child.eventCallbacks = []));
     }
 }

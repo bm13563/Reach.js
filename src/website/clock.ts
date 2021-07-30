@@ -13,20 +13,26 @@ export class Clock extends Component {
     }
 
     mount() {
-        // get the time, don't update - ensures that the clock is always right when restarted
-        this.setState("time", `${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`, false);
+        this.setState(
+            "time",
+            `${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`,
+            false,
+        );
 
         if (this.getState("active")) {
-            // this double renders, does it absolutely have to?
             const timer = setTimeout(() => {
                 this.setState(
                     "time",
                     `${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`,
+                    false,
                 );
-                this.setState("colour", "#" + ((1<<24)*Math.random() | 0).toString(16))
+                this.setState(
+                    "colour",
+                    "#" + (((1 << 24) * Math.random()) | 0).toString(16),
+                );
             }, 1000);
 
-            this.clear(() => {
+            this.flush(() => {
                 clearTimeout(timer);
             });
         }
@@ -46,8 +52,8 @@ export class Clock extends Component {
             }`,
             `.timer {
                 color: ${this.getState("colour")}
-            }`
-        ])
+            }`,
+        ]);
 
         this.compile(`
             <div class="wrapper">
@@ -58,9 +64,9 @@ export class Clock extends Component {
                             : "Timer stopped!"
                     }
                 </div>
-                <button class="test-button" onclick=${this.register( 
-                    () => {this.setState("active", !this.getState("active"))}
-                )}>
+                <button class="test-button" ${this.register("onclick", () => {
+                    this.setState("active", !this.getState("active"));
+                })}>
                     ${this.getState("active") ? "Stop timer" : "Start timer"}
                 </button>
             </div>
