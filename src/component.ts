@@ -3,76 +3,87 @@ import { generateId } from "./utilities";
 import { getSync } from "stacktrace-js";
 
 export class Component {
-    id: string = generateId();
-    name: string;
-    page: Page;
+    _id: string = generateId();
+    _name: string;
+    _page: Page;
     props?: Record<string, any>;
     state: Record<string, any> = {};
     children: Record<string, Component> = {};
-    parent: Component;
-    html: string = "";
-    css: string = "";
-    shouldMount: boolean = true;
-    eventCallbacks: any = [];
-    deferCallbacks: any = [];
-    flushCallbacks: any = [];
+    _parent: Component;
+    _recompile: boolean = true;
+    _htmlCache: string = "";
+    _cssCache: string = "";
+    _eventCallbacks: any = [];
+    _deferCallbacks: any = [];
+    _flushCallbacks: any = [];
 
     constructor(props?: any) {
         this.props = { ...props };
-        this.name = this.constructor.name;
+        this._name = this.constructor.name;
     }
 
-    mount(): any {
+    c(): any {
         // do nothing
     }
 
-    mountIfNeeded(): string {
-        if (this.shouldMount) {
-            this.mount();
-            return this.html;
+    _compile(): string {
+        if (this._recompile) {
+            this.c();
+            return this._htmlCache;
         } else {
-            return this.html;
+            return this._htmlCache;
         }
     }
 
-    style(css: string[]): any {
-        this.css = css
-            .map((attribute) => `[data-reachid="${this.id}"]${attribute}`)
+    _addToRenderPipeline() {
+        this._recompile = true;
+        if (this._parent) {
+            this._parent._addToRenderPipeline();
+        }
+    }
+
+    css(css: string[]): any {
+        this._cssCache = css
+            .map((attribute) => {
+                const formattedCss = attribute.split(" {");
+                return `${formattedCss[0]}[data-reachid="${this._id}"] {${formattedCss[1]}`;
+                // `[data-reachid="${this._id}"]${attribute}`
+            })
             .join(" ");
     }
 
-    compile(componentHtml: string) {
-        let html = componentHtml.replace(/>/g, ` data-reachid="${this.id}">`);
+    html(html: string) {
+        let formattedHtml = html.replace(/>/g, ` data-reachid="${this._id}">`);
         Object.keys(this.children).forEach((childKey: string) => {
-            const childId = this.children[childKey].id;
-            const childHtml = this.children[childKey].html;
-            html = html.replace(childId, childHtml);
+            const childId = this.children[childKey]._id;
+            const childHtml = this.children[childKey]._htmlCache;
+            formattedHtml = formattedHtml.replace(childId, childHtml);
         });
-        this.html = `
-            <style>${this.css}</style>
-            ${html}
+        this._htmlCache = `
+            <style>${this._cssCache}</style>
+            ${formattedHtml}
         `;
-        return this.html;
+        return this._htmlCache;
     }
 
     register(eventType: string, eventCallback: any) {
         const eventId = generateId();
         const eventCallbackProps = {
-            componentId: this.id,
+            componentId: this._id,
             eventId: eventId,
             eventType: eventType,
             eventCallback: eventCallback,
         };
-        this.eventCallbacks.push(eventCallbackProps);
+        this._eventCallbacks.push(eventCallbackProps);
         return `data-${eventId}="${eventId}"`;
     }
 
     flush(callback: any) {
-        this.flushCallbacks.push(callback);
+        this._flushCallbacks.push(callback);
     }
 
     defer(callback: any) {
-        this.deferCallbacks.push(callback);
+        this._deferCallbacks.push(callback);
     }
 
     child(childComponent: Component): string {
@@ -80,24 +91,17 @@ export class Component {
         let key = "";
         for (let x = 0; x < stack.length; x++) {
             key = key + stack[x].columnNumber + stack[x].lineNumber;
-            if (stack[x].functionName.includes("mountIfNeeded")) break;
+            if (stack[x].functionName.includes("compile")) break;
         }
         if (key in this.children) {
-            this.children[key].mountIfNeeded();
-            return this.children[key].id;
+            this.children[key]._compile();
+            return this.children[key]._id;
         } else {
-            childComponent.page = this.page;
-            childComponent.parent = this;
+            childComponent._page = this._page;
+            childComponent._parent = this;
             this.children[key] = childComponent;
-            childComponent.mountIfNeeded();
-            return childComponent.id;
-        }
-    }
-
-    parentShouldMount() {
-        if (this.parent) {
-            this.parent.shouldMount = true;
-            this.parent.parentShouldMount();
+            childComponent._compile();
+            return childComponent._id;
         }
     }
 
@@ -108,15 +112,15 @@ export class Component {
     setState(key: string, value: any, update: boolean = true) {
         this.state[key] = value;
         if (update) {
-            this.shouldMount = true;
-            this.parentShouldMount();
-            this.page.render();
+            this._recompile = true;
+            this._addToRenderPipeline();
+            this._page._render();
         }
     }
 
     elementFromDOM(selector: string) {
         return document.querySelectorAll(
-            `${selector}[data-reachid="${this.id}"]`,
+            `${selector}[data-reachid="${this._id}"]`,
         );
     }
 }

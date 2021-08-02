@@ -12,7 +12,7 @@ export class Clock extends Component {
         };
     }
 
-    mount() {
+    c() {
         this.setState(
             "time",
             `${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`,
@@ -37,7 +37,7 @@ export class Clock extends Component {
             });
         }
 
-        this.style([
+        this.css([
             `.test-button { 
                 padding: 10px;
                 border-radius: 10px;
@@ -55,7 +55,7 @@ export class Clock extends Component {
             }`,
         ]);
 
-        this.compile(`
+        this.html(`
             <div class="wrapper">
                 <div class="timer">
                     ${

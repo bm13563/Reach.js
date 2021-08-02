@@ -7,7 +7,7 @@ export class Layout extends Component {
         super();
     }
 
-    mount() {
+    c() {
         const tinyCard = new Card({
             headerText: "Tiny!",
             bodyText: "Reach.js is less than 1000 lines of code unminified.",
@@ -27,7 +27,7 @@ export class Layout extends Component {
             backgroundColourBase: "black",
         });
 
-        this.style([
+        this.css([
             `.wrapper { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); height: 100vh; gap: 50px; padding-left: 20vw; padding-right: 20vw; }`,
             `.title { grid-column: 1 / 4; grid-row: 1; text-align: center; font-size: 6rem; padding-top: 100px; }`,
             `.one { grid-column: 1; grid-row: 2 / 3; }`,
@@ -36,7 +36,7 @@ export class Layout extends Component {
             `.four { grid-column: 1 / 4; grid-row: 3; text-align: center; font-size: 5rem; }`,
         ]);
 
-        this.compile(`
+        this.html(`
             <div class="wrapper">
                 <div class="title">
                     Reach.js
