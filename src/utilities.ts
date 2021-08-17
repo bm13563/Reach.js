@@ -1,14 +1,28 @@
 import { vnode, VNode, DOMAPI, htmlDomApi } from "snabbdom";
+import { diff } from "just-diff";
+import { getSync } from "stacktrace-js";
 
-export const generateId = () => {
+export const generateId = (): string => {
     return Math.floor(Math.random() * 10000000).toString(36);
 };
 
-export const textToNode = (dom) => {
-    const wrapped = `<div>${dom}</div>`;
+export const textToNode = (domString: string): ChildNode => {
+    const wrapped = `<div>${domString}</div>`;
     return new DOMParser().parseFromString(wrapped, "text/html").body
         .firstChild;
 };
+
+export const getKeyFromStack = (stackEnd: string): string => {
+    const stack = getSync();
+    let key = "";
+    for (let x = 0; x < stack.length; x++) {
+        key = key + stack[x].columnNumber + stack[x].lineNumber;
+        if (stack[x].functionName.includes(stackEnd)) break;
+    }
+    return key;
+};
+
+export const isArrayDeepEqual = (x, y) => diff(x, y).length === 0;
 
 // forked version of toVNode function in snabbdom. updated to pull the dataset
 // through from DOM nodes (instead of as an attribute as done previously)

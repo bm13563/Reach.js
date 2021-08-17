@@ -1,6 +1,6 @@
 import { Page } from "./page";
-import { generateId } from "./utilities";
-import { getSync } from "stacktrace-js";
+
+import { generateId, getKeyFromStack, isArrayDeepEqual } from "./utilities";
 
 export class Component {
     _id: string = generateId();
@@ -16,6 +16,7 @@ export class Component {
     _eventCallbacks: any = [];
     _deferCallbacks: any = [];
     _flushCallbacks: any = [];
+    _watchTracker: any = {};
 
     constructor(props?: any) {
         this.props = { ...props };
@@ -42,17 +43,16 @@ export class Component {
         }
     }
 
-    css(css: string[]): any {
+    css(css: string[]): void {
         this._cssCache = css
             .map((attribute) => {
                 const formattedCss = attribute.split(" {");
                 return `${formattedCss[0]}[data-reachid="${this._id}"] {${formattedCss[1]}`;
-                // `[data-reachid="${this._id}"]${attribute}`
             })
             .join(" ");
     }
 
-    html(html: string) {
+    html(html: string): string {
         let formattedHtml = html.replace(/>/g, ` data-reachid="${this._id}">`);
         Object.keys(this.children).forEach((childKey: string) => {
             const childId = this.children[childKey]._id;
@@ -66,7 +66,7 @@ export class Component {
         return this._htmlCache;
     }
 
-    register(eventType: string, eventCallback: any) {
+    register(eventType: string, eventCallback: () => void): string {
         const eventId = generateId();
         const eventCallbackProps = {
             componentId: this._id,
@@ -78,21 +78,29 @@ export class Component {
         return `data-${eventId}="${eventId}"`;
     }
 
-    flush(callback: any) {
+    flush(callback: () => void) {
         this._flushCallbacks.push(callback);
     }
 
-    defer(callback: any) {
+    defer(callback: () => void) {
         this._deferCallbacks.push(callback);
     }
 
-    child(childComponent: Component): string {
-        const stack = getSync();
-        let key = "";
-        for (let x = 0; x < stack.length; x++) {
-            key = key + stack[x].columnNumber + stack[x].lineNumber;
-            if (stack[x].functionName.includes("compile")) break;
+    watch(callback, tracked: any[]) {
+        const key = getKeyFromStack("compile");
+        if (key in this._watchTracker) {
+            if (!isArrayDeepEqual(tracked, this._watchTracker[key])) {
+                this._watchTracker[key] = tracked;
+                callback();
+            }
+        } else {
+            this._watchTracker[key] = tracked;
+            callback();
         }
+    }
+
+    child(childComponent: Component): string {
+        const key = getKeyFromStack("compile");
         if (key in this.children) {
             this.children[key]._compile();
             return this.children[key]._id;
@@ -118,7 +126,7 @@ export class Component {
         }
     }
 
-    elementFromDOM(selector: string) {
+    elementsFromDOM(selector: string): NodeListOf<Element> {
         return document.querySelectorAll(
             `${selector}[data-reachid="${this._id}"]`,
         );

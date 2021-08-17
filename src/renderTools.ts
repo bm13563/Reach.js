@@ -10,25 +10,25 @@ export const _traverseRenderPipeline = (component: Component): Component[] => {
     return reRenderedComponents;
 };
 
-export const _fireFlushCallbacks = (child: Component) => {
+export const _fireFlushCallbacks = (child: Component): void => {
     child._flushCallbacks.forEach((callback) => {
         callback();
     });
     child._flushCallbacks = [];
 };
 
-export const _fireDeferCallbacks = (child: Component) => {
+export const _fireDeferCallbacks = (child: Component): void => {
     child._deferCallbacks.forEach((callback) => {
         callback();
     });
     child._deferCallbacks = [];
 };
 
-export const _resetRenderPipeline = (child: Component) => {
+export const _resetRenderPipeline = (child: Component): void => {
     child._recompile = false;
 };
 
-export const _insertEvents = (reRenderedComponents: any, node: any) => {
+export const _insertEvents = (reRenderedComponents: any, node: any): void => {
     const events = reRenderedComponents
         .map((child: Component) => child._eventCallbacks)
         .reduce((acc, val) => acc.concat(val), []);

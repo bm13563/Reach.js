@@ -19,23 +19,25 @@ export class Clock extends Component {
             false,
         );
 
-        if (this.getState("active")) {
-            const timer = setTimeout(() => {
-                this.setState(
-                    "time",
-                    `${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`,
-                    false,
-                );
-                this.setState(
-                    "colour",
-                    "#" + (((1 << 24) * Math.random()) | 0).toString(16),
-                );
-            }, 1000);
+        this.defer(() => {
+            if (this.getState("active")) {
+                const timer = setTimeout(() => {
+                    this.setState(
+                        "time",
+                        `${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`,
+                        false,
+                    );
+                    this.setState(
+                        "colour",
+                        "#" + (((1 << 24) * Math.random()) | 0).toString(16),
+                    );
+                }, 1000);
 
-            this.flush(() => {
-                clearTimeout(timer);
-            });
-        }
+                this.flush(() => {
+                    clearTimeout(timer);
+                });
+            }
+        });
 
         this.css([
             `.test-button { 
