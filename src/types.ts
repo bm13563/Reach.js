@@ -9,9 +9,9 @@ export interface IElement {
     fires?: any;
 }
 
-export interface ICallback {
-    type: string;
-    key: string;
-    nodes: any;
-    fires?: any;
+export interface IEventCallback {
+    componentId: string;
+    eventId: string;
+    eventType: any;
+    eventCallback: () => void;
 }

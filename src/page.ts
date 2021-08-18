@@ -1,4 +1,4 @@
-import { init } from "snabbdom";
+import { init, VNode } from "snabbdom";
 import { Component } from "./component";
 import {
     _insertEvents,
@@ -10,9 +10,9 @@ import {
 import { textToNode, forkedToVNode } from "./utilities";
 
 export class Page {
-    _patch: any;
     name: string;
-    _currentTree: any;
+    _patch: (oldVnode: VNode | Element, vnode: VNode) => VNode;
+    _currentTree: VNode;
     _rootComponent: Component;
 
     constructor(name: string) {
@@ -20,7 +20,10 @@ export class Page {
         this.name = name;
     }
 
-    addRootImage(rootComponent: Component) {
+    addRootImage(rootComponent: Component): void {
+        const test = textToNode("<div></div>");
+        this._currentTree = forkedToVNode(test);
+        document.body.appendChild(test);
         this._rootComponent = rootComponent;
         rootComponent._page = this;
         const html = rootComponent._compile();
@@ -35,7 +38,7 @@ export class Page {
         reRenderedComponents.map(_resetRenderPipeline);
     }
 
-    _render() {
+    _render(): void {
         const reRenderedComponents = _traverseRenderPipeline(
             this._rootComponent,
         );

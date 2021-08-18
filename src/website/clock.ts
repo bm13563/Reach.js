@@ -13,11 +13,19 @@ export class Clock extends Component {
     }
 
     c() {
-        this.setState(
-            "time",
-            `${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`,
-            false,
-        );
+
+        const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
+
+        this.watch(async () => {
+            this.setState(
+                "time",
+                `${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`,
+            );
+            for (let x = 0; x < 5; x++) {
+                    this.setState("test", x)
+                    await delay(1000);
+            }
+        }, [this.getState("active")]);
 
         this.defer(() => {
             if (this.getState("active")) {
@@ -25,7 +33,6 @@ export class Clock extends Component {
                     this.setState(
                         "time",
                         `${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`,
-                        false,
                     );
                     this.setState(
                         "colour",
@@ -71,6 +78,7 @@ export class Clock extends Component {
                 })}>
                     ${this.getState("active") ? "Stop timer" : "Start timer"}
                 </button>
+                <div>${this.getState("test")}</div>
             </div>
         `);
     }

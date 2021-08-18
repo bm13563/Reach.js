@@ -1,4 +1,5 @@
 import { Component } from "./component";
+import { IEventCallback } from "./types";
 
 export const _traverseRenderPipeline = (component: Component): Component[] => {
     const reRenderedComponents = [];
@@ -11,33 +12,45 @@ export const _traverseRenderPipeline = (component: Component): Component[] => {
 };
 
 export const _fireFlushCallbacks = (child: Component): void => {
-    child._flushCallbacks.forEach((callback) => {
+    for (let x = child._flushCallbacks.length - 1; x >= 0; x--) {
+        const callback = child._flushCallbacks[x];
+        child._flushCallbacks.splice(x, 1);
         callback();
-    });
-    child._flushCallbacks = [];
+    }
 };
 
 export const _fireDeferCallbacks = (child: Component): void => {
-    child._deferCallbacks.forEach((callback) => {
+    for (let x = child._deferCallbacks.length - 1; x >= 0; x--) {
+        const callback = child._deferCallbacks[x];
+        child._deferCallbacks.splice(x, 1);
         callback();
-    });
-    child._deferCallbacks = [];
+    }
 };
 
 export const _resetRenderPipeline = (child: Component): void => {
     child._recompile = false;
 };
 
-export const _insertEvents = (reRenderedComponents: any, node: any): void => {
+export const _insertEvents = (
+    reRenderedComponents: Component[],
+    node: ChildNode,
+): void => {
     const events = reRenderedComponents
         .map((child: Component) => child._eventCallbacks)
-        .reduce((acc, val) => acc.concat(val), []);
-    events.forEach((event) => {
-        const element = node.querySelector(`[data-${event.eventId}]`);
+        .reduce(
+            (acc: IEventCallback[], val: IEventCallback[]) => acc.concat(val),
+            [],
+        );
+    events.forEach((event: IEventCallback) => {
+        const element = (<Element>node.parentNode).querySelector(
+            `[data-${event.eventId}]`,
+        );
         if (element) {
-            delete element.dataset[event.eventId];
+            if (element instanceof HTMLElement) {
+                delete element.dataset[event.eventId];
+            }
             element[event.eventType] = event.eventCallback;
         }
     });
-    reRenderedComponents.map((child) => (child.eventCallbacks = []));
+    reRenderedComponents.map((child) => (child._eventCallbacks = []));
 };

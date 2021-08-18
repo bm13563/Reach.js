@@ -24,10 +24,6 @@ export class Card extends Component {
             return this.getState("open") ? open : closed;
         };
 
-        this.watch(() => {
-            console.log("yoooooooo");
-        }, [this.getState("open")]);
-
         this.css([
             `.wrapper {
                 display: flex;

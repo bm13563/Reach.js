@@ -22,7 +22,7 @@ export const getKeyFromStack = (stackEnd: string): string => {
     return key;
 };
 
-export const isArrayDeepEqual = (x, y) => diff(x, y).length === 0;
+export const isArrayDeepEqual = (x: any[], y: any[]) => diff(x, y).length === 0;
 
 // forked version of toVNode function in snabbdom. updated to pull the dataset
 // through from DOM nodes (instead of as an attribute as done previously)

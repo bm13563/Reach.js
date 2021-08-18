@@ -1,4 +1,7 @@
+import { getSync } from "stacktrace-js";
+import { isDeepStrictEqual } from "util";
 import { Page } from "./page";
+import { IEventCallback } from "./types";
 
 import { generateId, getKeyFromStack, isArrayDeepEqual } from "./utilities";
 
@@ -13,17 +16,17 @@ export class Component {
     _recompile: boolean = true;
     _htmlCache: string = "";
     _cssCache: string = "";
-    _eventCallbacks: any = [];
-    _deferCallbacks: any = [];
-    _flushCallbacks: any = [];
-    _watchTracker: any = {};
+    _eventCallbacks: IEventCallback[] = [];
+    _deferCallbacks: (() => void)[] = [];
+    _flushCallbacks: (() => void)[] = [];
+    _watchTracker: Record<string, any[]> = {};
 
     constructor(props?: any) {
         this.props = { ...props };
         this._name = this.constructor.name;
     }
 
-    c(): any {
+    c(): void {
         // do nothing
     }
 
@@ -36,7 +39,7 @@ export class Component {
         }
     }
 
-    _addToRenderPipeline() {
+    _addToRenderPipeline(): void {
         this._recompile = true;
         if (this._parent) {
             this._parent._addToRenderPipeline();
@@ -68,7 +71,7 @@ export class Component {
 
     register(eventType: string, eventCallback: () => void): string {
         const eventId = generateId();
-        const eventCallbackProps = {
+        const eventCallbackProps: IEventCallback = {
             componentId: this._id,
             eventId: eventId,
             eventType: eventType,
@@ -78,15 +81,15 @@ export class Component {
         return `data-${eventId}="${eventId}"`;
     }
 
-    flush(callback: () => void) {
+    flush(callback: () => void): void {
         this._flushCallbacks.push(callback);
     }
 
-    defer(callback: () => void) {
+    defer(callback: () => void): void {
         this._deferCallbacks.push(callback);
     }
 
-    watch(callback, tracked: any[]) {
+    watch(callback: () => void, tracked: any[]): void {
         const key = getKeyFromStack("compile");
         if (key in this._watchTracker) {
             if (!isArrayDeepEqual(tracked, this._watchTracker[key])) {
@@ -95,7 +98,6 @@ export class Component {
             }
         } else {
             this._watchTracker[key] = tracked;
-            callback();
         }
     }
 
@@ -113,17 +115,15 @@ export class Component {
         }
     }
 
-    getState(key: string) {
+    getState(key: string): any {
         return this.state[key];
     }
 
-    setState(key: string, value: any, update: boolean = true) {
+    setState(key: string, value: any) {
         this.state[key] = value;
-        if (update) {
-            this._recompile = true;
-            this._addToRenderPipeline();
-            this._page._render();
-        }
+        this._recompile = true;
+        this._addToRenderPipeline();
+        this._page._render();
     }
 
     elementsFromDOM(selector: string): NodeListOf<Element> {
