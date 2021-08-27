@@ -1,7 +1,5 @@
-import { getSync } from "stacktrace-js";
-import { isDeepStrictEqual } from "util";
 import { Page } from "./page";
-import { IEventCallback } from "./types";
+import { IBindMethods, IEventCallback } from "./types";
 
 import { generateId, getKeyFromStack, isArrayDeepEqual } from "./utilities";
 
@@ -13,34 +11,53 @@ export class Component {
     state: Record<string, any> = {};
     children: Record<string, Component> = {};
     _parent: Component;
-    _recompile: boolean = true;
+    _shouldUpdateInNextRender: boolean = true;
+    _blockRerenderWhileCompiling: boolean = false;
     _htmlCache: string = "";
     _cssCache: string = "";
     _eventCallbacks: IEventCallback[] = [];
     _deferCallbacks: (() => void)[] = [];
     _flushCallbacks: (() => void)[] = [];
     _watchTracker: Record<string, any[]> = {};
+    t;
+    tstate = {}
 
     constructor(props?: any) {
         this.props = { ...props };
         this._name = this.constructor.name;
     }
 
-    c(): void {
+    c(fn?: IBindMethods): void {
         // do nothing
     }
 
     _compile(): string {
-        if (this._recompile) {
-            this.c();
+        if (this._shouldUpdateInNextRender) {
+            const compileWithBoundMethods = this.c.bind(this, this._bindMethods());
+            this._blockRerenderWhileCompiling = true;
+            compileWithBoundMethods();
+            this._blockRerenderWhileCompiling = false;
             return this._htmlCache;
         } else {
             return this._htmlCache;
         }
     }
 
+    _bindMethods(): IBindMethods {
+        return {
+            defer: this.defer.bind(this),
+            css: this.css.bind(this),
+            html: this.html.bind(this),
+            register: this.register.bind(this),
+            child: this.child.bind(this),
+            watch: this.watch.bind(this),
+            setState: this.setState.bind(this),
+            getState: this.getState.bind(this),
+        };
+    }
+
     _addToRenderPipeline(): void {
-        this._recompile = true;
+        this._shouldUpdateInNextRender = true;
         if (this._parent) {
             this._parent._addToRenderPipeline();
         }
@@ -63,7 +80,7 @@ export class Component {
             formattedHtml = formattedHtml.replace(childId, childHtml);
         });
         this._htmlCache = `
-            <style>${this._cssCache}</style>
+            <style data-reachid="${this._id}-style">${this._cssCache}</style>
             ${formattedHtml}
         `;
         return this._htmlCache;
@@ -86,6 +103,7 @@ export class Component {
     }
 
     defer(callback: () => void): void {
+        console.log(this);
         this._deferCallbacks.push(callback);
     }
 
@@ -119,16 +137,11 @@ export class Component {
         return this.state[key];
     }
 
-    setState(key: string, value: any) {
+    setState(key: string, value: any): void {
         this.state[key] = value;
-        this._recompile = true;
+        if (this._blockRerenderWhileCompiling) return;
+        this._shouldUpdateInNextRender = true;
         this._addToRenderPipeline();
         this._page._render();
-    }
-
-    elementsFromDOM(selector: string): NodeListOf<Element> {
-        return document.querySelectorAll(
-            `${selector}[data-reachid="${this._id}"]`,
-        );
     }
 }

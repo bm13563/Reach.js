@@ -3,9 +3,10 @@ import { IEventCallback } from "./types";
 
 export const _traverseRenderPipeline = (component: Component): Component[] => {
     const reRenderedComponents = [];
-    if (component._recompile) reRenderedComponents.push(component);
+    if (component._shouldUpdateInNextRender)
+        reRenderedComponents.push(component);
     for (const [childId, child] of Object.entries(component.children)) {
-        if (child._recompile)
+        if (child._shouldUpdateInNextRender)
             reRenderedComponents.push(..._traverseRenderPipeline(child));
     }
     return reRenderedComponents;
@@ -28,7 +29,7 @@ export const _fireDeferCallbacks = (child: Component): void => {
 };
 
 export const _resetRenderPipeline = (child: Component): void => {
-    child._recompile = false;
+    child._shouldUpdateInNextRender = false;
 };
 
 export const _insertEvents = (

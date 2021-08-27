@@ -1,7 +1,5 @@
 import { Component } from "../component";
 
-// testing the clear function -> can we clean up our setTimeout when we need to?
-
 export class Clock extends Component {
     constructor() {
         super();
@@ -9,22 +7,17 @@ export class Clock extends Component {
             active: true,
             time: `${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`,
             colour: "black",
+            test: 0,
         };
     }
-
+    
     c() {
-
-        const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
-
-        this.watch(async () => {
+        this.watch(() => {
             this.setState(
                 "time",
                 `${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`,
             );
-            for (let x = 0; x < 5; x++) {
-                    this.setState("test", x)
-                    await delay(1000);
-            }
+            this.setState("test", this.getState("test") + 1);
         }, [this.getState("active")]);
 
         this.defer(() => {
@@ -33,10 +26,6 @@ export class Clock extends Component {
                     this.setState(
                         "time",
                         `${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`,
-                    );
-                    this.setState(
-                        "colour",
-                        "#" + (((1 << 24) * Math.random()) | 0).toString(16),
                     );
                 }, 1000);
 
@@ -78,7 +67,6 @@ export class Clock extends Component {
                 })}>
                     ${this.getState("active") ? "Stop timer" : "Start timer"}
                 </button>
-                <div>${this.getState("test")}</div>
             </div>
         `);
     }

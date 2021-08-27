@@ -15,16 +15,16 @@ export class Card extends Component {
         };
     }
 
-    c() {
+    c({ css, html, getState, register, setState }) {
         const changeState = () => {
-            const newState = !this.getState("open");
-            this.setState("open", newState);
+            const newState = !getState("open");
+            setState("open", newState);
         };
         const isOpen = (open: any, closed: any) => {
-            return this.getState("open") ? open : closed;
+            return getState("open") ? open : closed;
         };
 
-        this.css([
+        css([
             `.wrapper {
                 display: flex;
                 flex-direction: column;
@@ -56,8 +56,8 @@ export class Card extends Component {
             }`,
         ]);
 
-        this.html(`
-            <div ${this.register("onclick", changeState)} class="wrapper">
+        html(`
+            <div ${register("onclick", changeState)} class="wrapper">
                 <div class="title-wrapper">
                     <div class="title">${this.props.headerText}</div>
                 </div>
