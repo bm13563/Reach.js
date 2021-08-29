@@ -7,7 +7,7 @@ import {
     _fireFlushCallbacks,
     _traverseRenderPipeline,
 } from "./renderTools";
-import { textToNode, forkedToVNode } from "./utilities";
+import { _textToNode, _forkedToVNode } from "./utilities";
 
 export class Page {
     name: string;
@@ -21,8 +21,8 @@ export class Page {
     }
 
     addRootImage(rootComponent: Component): void {
-        const test = textToNode("<div></div>");
-        this._currentTree = forkedToVNode(test);
+        const test = _textToNode("<div></div>");
+        this._currentTree = _forkedToVNode(test);
         document.body.appendChild(test);
         this._rootComponent = rootComponent;
         rootComponent._page = this;
@@ -30,9 +30,9 @@ export class Page {
         const reRenderedComponents = _traverseRenderPipeline(
             this._rootComponent,
         );
-        const node = textToNode(html);
+        const node = _textToNode(html);
         _insertEvents(reRenderedComponents, node);
-        this._currentTree = forkedToVNode(node);
+        this._currentTree = _forkedToVNode(node);
         document.body.appendChild(node);
         reRenderedComponents.map(_fireDeferCallbacks);
         reRenderedComponents.map(_resetRenderPipeline);
@@ -44,9 +44,9 @@ export class Page {
         );
         reRenderedComponents.map(_fireFlushCallbacks);
         const html = this._rootComponent._compile();
-        const node = textToNode(html);
+        const node = _textToNode(html);
         _insertEvents(reRenderedComponents, node);
-        const tree = forkedToVNode(node);
+        const tree = _forkedToVNode(node);
         this._patch(this._currentTree, tree);
         this._currentTree = tree;
         reRenderedComponents.map(_fireDeferCallbacks);

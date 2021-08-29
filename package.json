@@ -6,10 +6,11 @@
         "build": "webpack"
     },
     "devDependencies": {
-        "@types/node": "^15.6.1",
+        "@types/node": "^16.7.5",
         "@typescript-eslint/eslint-plugin": "^4.26.0",
         "@typescript-eslint/parser": "^4.26.0",
         "eslint": "^7.27.0",
+        "just-diff": "^3.1.1",
         "node-polyfill-webpack-plugin": "^1.1.2",
         "prettier": "2.3.0",
         "snabbdom": "^3.0.3",
@@ -19,7 +20,11 @@
         "typescript": "^4.3.2",
         "webpack": "^5.38.1",
         "webpack-cli": "^4.7.0",
-        "webpack-dev-server": "^3.11.2",
-        "just-diff": "^3.1.1"
+        "webpack-dev-server": "^3.11.2"
+    },
+    "dependencies": {
+        "@types/querystringify": "^2.0.0",
+        "history": "^5.0.1",
+        "querystringify": "^2.2.0"
     }
 }

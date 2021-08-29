@@ -1,5 +1,7 @@
 {
     "stagerOptions": {
+        "types": ["node"],
+        "typeRoots": ["../node_modules/@types"],
         "outDir": "./dist/",
         "sourceMap": true,
         "noImplicitAny": true,

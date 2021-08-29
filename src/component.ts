@@ -1,10 +1,10 @@
 import { Page } from "./page";
 import { IBindMethods, IEventCallback } from "./types";
 
-import { generateId, getKeyFromStack, isArrayDeepEqual } from "./utilities";
+import { _generateId, _getKeyFromStack, _isArrayDeepEqual } from "./utilities";
 
 export class Component {
-    _id: string = generateId();
+    _id: string = _generateId();
     _name: string;
     _page: Page;
     props?: Record<string, any>;
@@ -19,8 +19,6 @@ export class Component {
     _deferCallbacks: (() => void)[] = [];
     _flushCallbacks: (() => void)[] = [];
     _watchTracker: Record<string, any[]> = {};
-    t;
-    tstate = {}
 
     constructor(props?: any) {
         this.props = { ...props };
@@ -33,19 +31,21 @@ export class Component {
 
     _compile(): string {
         if (this._shouldUpdateInNextRender) {
-            const compileWithBoundMethods = this.c.bind(this, this._bindMethods());
+            const compileWithBoundMethods = this.c.bind(
+                this,
+                this._bindMethods(),
+            );
             this._blockRerenderWhileCompiling = true;
             compileWithBoundMethods();
             this._blockRerenderWhileCompiling = false;
             return this._htmlCache;
-        } else {
-            return this._htmlCache;
         }
+        return this._htmlCache;
     }
 
     _bindMethods(): IBindMethods {
         return {
-            defer: this.defer.bind(this),
+            delay: this.delay.bind(this),
             css: this.css.bind(this),
             html: this.html.bind(this),
             register: this.register.bind(this),
@@ -58,14 +58,12 @@ export class Component {
 
     _addToRenderPipeline(): void {
         this._shouldUpdateInNextRender = true;
-        if (this._parent) {
-            this._parent._addToRenderPipeline();
-        }
+        if (this._parent) this._parent._addToRenderPipeline();
     }
 
     css(css: string[]): void {
         this._cssCache = css
-            .map((attribute) => {
+            .map((attribute: string) => {
                 const formattedCss = attribute.split(" {");
                 return `${formattedCss[0]}[data-reachid="${this._id}"] {${formattedCss[1]}`;
             })
@@ -87,7 +85,7 @@ export class Component {
     }
 
     register(eventType: string, eventCallback: () => void): string {
-        const eventId = generateId();
+        const eventId = _generateId();
         const eventCallbackProps: IEventCallback = {
             componentId: this._id,
             eventId: eventId,
@@ -102,15 +100,14 @@ export class Component {
         this._flushCallbacks.push(callback);
     }
 
-    defer(callback: () => void): void {
-        console.log(this);
+    delay(callback: () => void): void {
         this._deferCallbacks.push(callback);
     }
 
     watch(callback: () => void, tracked: any[]): void {
-        const key = getKeyFromStack("compile");
+        const key = _getKeyFromStack("compile");
         if (key in this._watchTracker) {
-            if (!isArrayDeepEqual(tracked, this._watchTracker[key])) {
+            if (!_isArrayDeepEqual(tracked, this._watchTracker[key])) {
                 this._watchTracker[key] = tracked;
                 callback();
             }
@@ -120,7 +117,7 @@ export class Component {
     }
 
     child(childComponent: Component): string {
-        const key = getKeyFromStack("compile");
+        const key = _getKeyFromStack("compile");
         if (key in this.children) {
             this.children[key]._compile();
             return this.children[key]._id;

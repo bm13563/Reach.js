@@ -7,6 +7,9 @@ module.exports = {
 
     devServer: {
         contentBase: "./dist",
+        historyApiFallback: {
+            index: "index.html",
+        },
     },
     module: {
         rules: [

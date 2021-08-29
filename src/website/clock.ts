@@ -10,7 +10,7 @@ export class Clock extends Component {
             test: 0,
         };
     }
-    
+
     c() {
         this.watch(() => {
             this.setState(
@@ -20,7 +20,7 @@ export class Clock extends Component {
             this.setState("test", this.getState("test") + 1);
         }, [this.getState("active")]);
 
-        this.defer(() => {
+        this.delay(() => {
             if (this.getState("active")) {
                 const timer = setTimeout(() => {
                     this.setState(

@@ -1,18 +1,19 @@
 import { vnode, VNode, DOMAPI, htmlDomApi } from "snabbdom";
 import { diff } from "just-diff";
 import { getSync } from "stacktrace-js";
+import { parse } from "querystringify";
 
-export const generateId = (): string => {
+export const _generateId = (): string => {
     return Math.floor(Math.random() * 10000000).toString(36);
 };
 
-export const textToNode = (domString: string): ChildNode => {
+export const _textToNode = (domString: string): ChildNode => {
     const wrapped = `<div>${domString}</div>`;
     return new DOMParser().parseFromString(wrapped, "text/html").body
         .firstChild;
 };
 
-export const getKeyFromStack = (stackEnd: string): string => {
+export const _getKeyFromStack = (stackEnd: string): string => {
     const stack = getSync();
     let key = "";
     for (let x = 0; x < stack.length; x++) {
@@ -22,11 +23,12 @@ export const getKeyFromStack = (stackEnd: string): string => {
     return key;
 };
 
-export const isArrayDeepEqual = (x: any[], y: any[]) => diff(x, y).length === 0;
+export const _isArrayDeepEqual = (x: any[], y: any[]) =>
+    diff(x, y).length === 0;
 
 // forked version of toVNode function in snabbdom. updated to pull the dataset
 // through from DOM nodes (instead of as an attribute as done previously)
-export const forkedToVNode = (node: Node, domApi?: DOMAPI): VNode => {
+export const _forkedToVNode = (node: Node, domApi?: DOMAPI): VNode => {
     const api: DOMAPI = domApi !== undefined ? domApi : htmlDomApi;
     let text: string;
     if (api.isElement(node)) {
@@ -53,7 +55,7 @@ export const forkedToVNode = (node: Node, domApi?: DOMAPI): VNode => {
         }
         for (i = 0, n = elmChildren.length; i < n; i++) {
             // updated here
-            children.push(forkedToVNode(elmChildren[i], domApi));
+            children.push(_forkedToVNode(elmChildren[i], domApi));
         }
         // updated here
         return vnode(sel, { attrs, dataset }, children, undefined, node);
@@ -67,3 +69,12 @@ export const forkedToVNode = (node: Node, domApi?: DOMAPI): VNode => {
         return vnode("", {}, [], undefined, node as any);
     }
 };
+
+export function locationToRoute(location) {
+    // location comes from the history package
+    return {
+        path: location.pathname,
+        hash: location.hash,
+        query: parse(location.search),
+    };
+}

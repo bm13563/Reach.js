@@ -15,5 +15,15 @@
 
 import { Layout } from "./website/layout";
 import { Page } from "./page";
+import { App } from "./app";
+import { NotFound } from "./website/404";
 
-const page = new Page("counter").addRootImage(new Layout());
+const app = new App();
+app.route(new Layout(), "/layout");
+app.notFound(new NotFound())
+// const page = new Page("counter").addRootImage(new Layout());
+
+// import { Page } from "./page";
+// import { Component } from "./component";
+
+// export { Page, Component };
