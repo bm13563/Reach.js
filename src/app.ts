@@ -1,24 +1,17 @@
 import { Component } from "./component";
 import { Page } from "./page";
-import { createBrowserHistory } from "history";
-import { locationToRoute } from "./utilities";
-let history = createBrowserHistory();
 
 export class App {
-    _currentPath = window.location.pathname;
-    _page: Page;
     _pageFound: boolean = false;
 
     route(component: Component, path: string) {
-        if (this._currentPath === path) {
+        if (window.location.pathname === path) {
             this._pageFound = true;
-            return new Page("test").addRootImage(component);
-        } else {
-            return null;
+            new Page("test").addRootImage(component);
         }
     }
 
     notFound(component: Component) {
-        if (!this._pageFound) return new Page("test").addRootImage(component);
+        if (!this._pageFound) new Page("test").addRootImage(component);
     }
 }
