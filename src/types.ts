@@ -25,4 +25,5 @@ export interface IBindMethods {
     watch: (callback: () => void, tracked: any[]) => void;
     setState: (key: string, value: any) => void;
     getState: (key: string) => any;
+    props: any;
 }

@@ -45,6 +45,7 @@ export class Component {
 
     _bindMethods(): IBindMethods {
         return {
+            props: this.props.bind(this),
             delay: this.delay.bind(this),
             css: this.css.bind(this),
             html: this.html.bind(this),
