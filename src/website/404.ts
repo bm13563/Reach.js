@@ -8,6 +8,6 @@ export class NotFound extends Component {
     c() {
         this.html(`
             <div>Page not found!</div>
-        `)
+        `);
     }
 }

@@ -6,6 +6,7 @@ let history = createBrowserHistory();
 
 export class App {
     _currentPath = window.location.pathname;
+    _page: Page;
     _pageFound: boolean = false;
 
     route(component: Component, path: string) {

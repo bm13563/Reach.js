@@ -21,6 +21,8 @@ export class Page {
     }
 
     addRootImage(rootComponent: Component): void {
+        // ensures that pages are mutually exclusive
+        document.body.innerHTML = "";
         const test = _textToNode("<div></div>");
         this._currentTree = _forkedToVNode(test);
         document.body.appendChild(test);

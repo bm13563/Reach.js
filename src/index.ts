@@ -17,10 +17,13 @@ import { Layout } from "./website/layout";
 import { Page } from "./page";
 import { App } from "./app";
 import { NotFound } from "./website/404";
+import { Card } from "./website/flexCard";
+import { Clock } from "./website/clock";
 
 const app = new App();
+app.notFound(new NotFound());
 app.route(new Layout(), "/layout");
-app.notFound(new NotFound())
+app.route(new Clock(), "/clock");
 // const page = new Page("counter").addRootImage(new Layout());
 
 // import { Page } from "./page";
