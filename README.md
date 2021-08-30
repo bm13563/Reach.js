@@ -38,7 +38,7 @@ export class Statement extends Component {
 
 Yeah yeah. Imo class-based components aren't really that bad. Sure there's a bit more boilerplate and sure ```this``` can be confusing, but it is what it is
 
-Shameless plug - you might have noticed the absense of ```this``` in the above snippet, which is apparently a good thing. Thanks to some janky binding, you can choose to abstain from the use of ```this```, especially if it makes you more feel like you can run faster or sing like Chaka Khan
+Shameless plug - you might have noticed the absense of ```this``` in the above snippet, which is apparently a good thing. Thanks to some janky binding, you can choose to abstain from the use of ```this```, especially if it makes you feel like you can run faster or sing like Chaka Khan
 
 ## So why is it better than anything else out there?
 
