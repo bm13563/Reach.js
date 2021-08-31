@@ -46,4 +46,4 @@ It isn't. It's actually a lot worse than most other front-end frameworks, becaus
 
 ## Well that sounds rubbish
 
-Depends on your point of view. Some antipatterns are actually pretty convenient, although I won't turn up at your house if you choose not to use them. Reach is designed to be unopinionated, so how you choose to develop your application is up to you, even if Reach does subtly encourage you to embrace bad practice occasionally by dangling it in front of you
+Depends on your point of view. Some antipatterns are actually pretty convenient, although I won't turn up at your house if you choose not to use them. Reach is designed to be unopinionated, so how you choose to develop your application is up to you, even if Reach does subtly encourage you to embrace bad practice occasionally
