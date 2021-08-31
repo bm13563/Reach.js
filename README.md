@@ -6,7 +6,7 @@ Yep. Sorry.
 
 ## So what is it?
 
-It's a tool for creating single-file components without the use of render functions or transpilers. Transpilers are bulky and render functions are messy. Reach eliminates the need for both, enabling it to become simultaneously bulky and messy
+It's a tool for creating single-file components without the use of render functions or transpilers. Transpilers are bulky and render functions are messy. Reach doesn't use either, and in doing so becomes more bulky AND more messy
 
 Components are built from html + css strings, which can be injected with event handlers via string templating. Reach uses class-based components to handle state. A basic component might look like this:
 
@@ -21,12 +21,12 @@ export class Statement extends Component {
         }
     }
 
-    c({props, register, setState, getState}) {
+    c({props, register, setState, getState, html}) {
         const updateStatement = () => {
             setState("statement", "Reach.js is fundamentally flawed with few redeeming qualities");
         }
 
-        this.html(`
+        html(`
             <div>${props.warmGreeting}</div>
             <div ${register("onclick", updateStatement)}>${getState("statement")}</div>
         `);
